@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // --- CONFIGURACIÓN DE GEMINI API ---
 // Pega aquí la clave que generaste en Google AI Studio:
-const API_KEY = "AQ.Ab8RN6KXxdA2iv-1bXUcnb04a7ocfAxGBUYn9vPMYMdgcGDQyQ"; 
+const API_KEY = "AQ.Ab8RN6L4PMTo4SGaXOH6zLrzGMaE6Bz_Upa9XtnJ5qpkwrrEQA"; 
 
 const systemInstruction = `Eres Técnico Experto de Mantenimiento de Amazon RME en RMU1. Eres el especialista absoluto de este centro logístico en protocolos de soldadura, cortadoras y bandas. 
 Responde a los técnicos de forma profesional, clara, directa y muy bien estructurada usando listas.
