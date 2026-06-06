@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Soldadura | RME Toolkit</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    .chat-container { display: flex; flex-direction: column; height: calc(100vh - var(--topbar-h)); max-width: 900px; margin: 0 auto; width: 100%; border-left: 1px solid var(--border); border-right: 1px solid var(--border); background: var(--bg-panel); position: relative; }
+    .chat-history { flex: 1; overflow-y: auto; padding: 32px 24px; display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth; }
+    
+    .msg-bot, .msg-user { display: flex; max-width: 85%; animation: slideUp 0.3s ease forwards; }
+    .msg-bot { align-self: flex-start; }
+    .msg-user { align-self: flex-end; flex-direction: row-reverse; }
+    
+    .msg-avatar { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; flex-shrink: 0; margin: 0 12px; }
+    .msg-bot .msg-avatar { background: rgba(255, 153, 0, 0.15); color: var(--amz); border: 1px solid rgba(255, 153, 0, 0.3); }
+    .msg-user .msg-avatar { background: var(--card2); color: var(--text-muted); border: 1px solid var(--border); }
+    
+    .msg-bubble { padding: 16px 20px; border-radius: 12px; font-size: 14px; line-height: 1.6; font-family: var(--font-body); }
+    .msg-bot .msg-bubble { background: var(--card); border: 1px solid var(--border); color: var(--text-main); border-top-left-radius: 2px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .msg-user .msg-bubble { background: rgba(255,255,255,0.05); border: 1px solid var(--border2); color: var(--text-main); border-top-right-radius: 2px; }
+    
+    /* Estilos para las negritas y listas que enviará Gemini */
+    .msg-bot .msg-bubble strong { color: var(--amz); }
+    .msg-bot .msg-bubble ul { margin-left: 20px; margin-top: 8px; margin-bottom: 8px; }
+    .msg-bot .msg-bubble li { margin-bottom: 4px; }
+
+    .chat-input-area { padding: 24px; background: var(--bg); border-top: 1px solid var(--border); }
+    .chat-input-wrapper { display: flex; gap: 12px; background: var(--card2); border: 1px solid var(--border-field); border-radius: 8px; padding: 8px; transition: border-color 0.2s; }
+    .chat-input-wrapper:focus-within { border-color: var(--amz); }
+    .chat-input { flex: 1; background: transparent; border: none; color: var(--text-main); font-family: var(--font-body); font-size: 15px; padding: 8px 12px; outline: none; }
+    .chat-btn { background: var(--amz); color: #000; border: none; border-radius: 6px; padding: 0 20px; font-family: var(--font-display); font-size: 16px; font-weight: 900; cursor: pointer; transition: transform 0.1s; letter-spacing: 1px; }
+    .chat-btn:active { transform: scale(0.95); }
+    .chat-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Animación de "Cargando..." */
+    .typing-indicator { display: flex; gap: 4px; padding: 8px 4px; }
+    .typing-indicator span { width: 6px; height: 6px; background: var(--amz); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="app-layout">
+  <div id="transition" class="page-transition"></div>
+
+  <header class="topbar" style="--tb-color: #FF9900">
+    <div class="tb-zone">
+      <a href="index.html" class="t-display tb-logo">RMEHub</a>
+      <div class="tb-divider"></div>
+      <div class="tb-breadcrumb">IA Soldadura RMU1</div>
+    </div>
+    <div class="tb-zone">
+      <div class="status-dot"></div>
+      <a href="index.html" class="btn-back">← <span class="back-text">Inicio</span></a>
+      <div class="avatar">OL</div>
+    </div>
+  </header>
+
+  <main class="chat-container">
+    <div class="chat-history" id="chatBox">
+      <div class="msg-bot">
+        <div class="msg-avatar">AI</div>
+        <div class="msg-bubble">
+          Sistemas operativos en RMU1. Soy el especialista técnico con tecnología Gemini. Conozco todos los protocolos de la prensa 1325, cortadoras, procedimientos y bandas.<br><br>
+          ¿En qué proceso te puedo ayudar hoy?
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat-input-area">
+      <form class="chat-input-wrapper" id="chatForm">
+        <input type="text" id="userInput" class="chat-input" placeholder="Ej: Dime los pasos para soldar la banda SDI Ammeraal..." autocomplete="off">
+        <button type="submit" id="sendBtn" class="chat-btn">ENVIAR</button>
+      </form>
+    </div>
+  </main>
+
+  <script src="main-bot.js"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Correas | RME Toolkit</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <div id="transition" class="page-transition"></div>
+
+  <header class="topbar" style="--tb-color: var(--accent-correas)">
+    <div class="tb-zone">
+      <a href="index.html" class="t-display tb-logo">RMEHub</a>
+      <div class="tb-divider"></div>
+      <div class="tb-breadcrumb">Tensión de Correas Hz</div>
+    </div>
+    <div class="tb-zone">
+      <div class="status-dot"></div>
+      <a href="index.html" class="btn-back">← <span class="back-text">Inicio</span></a>
+      <div class="avatar">OL</div>
+      <button class="mobile-toggle" onclick="toggleDrawer()">☰</button>
+    </div>
+  </header>
+
+  <div class="layout-main">
+    <aside class="col-left" id="drawer">
+      <div class="t-micro" style="padding: 16px;">Cálculo Mecánico</div>
+      <div style="padding: 0 16px; overflow-y: auto; flex: 1;">
+        <div class="input-group">
+          <input type="number" id="t-p" placeholder=" " required step="0.1" oninput="calcTension()">
+          <label class="t-caption">Potencia Motor (kW)</label>
+        </div>
+        <div class="input-group">
+          <input type="number" id="t-carga" placeholder=" " required value="100" min="1" max="100" oninput="calcTension()">
+          <label class="t-caption">Carga Operativa % (Ajuste)</label>
+        </div>
+        <div class="input-group">
+          <input type="number" id="t-rpm" placeholder=" " required oninput="calcTension()">
+          <label class="t-caption">RPM Polea Motriz</label>
+        </div>
+        <div class="input-group">
+          <input type="number" id="t-z1" placeholder=" " required oninput="calcTension()">
+          <label class="t-caption">Nº Dientes Motriz (z1)</label>
+        </div>
+        <div class="input-group">
+          <input type="number" id="t-z2" placeholder=" " required oninput="calcTension()">
+          <label class="t-caption">Nº Dientes Conducida (z2)</label>
+        </div>
+        <div class="input-group">
+          <select id="t-perfil" required onchange="calcTension()">
+            <option value="" disabled selected hidden></option>
+            <option value="3M">3M</option>
+            <option value="5M">5M</option>
+            <option value="8M">8M</option>
+            <option value="14M">14M</option>
+            <option value="T5">T5</option>
+            <option value="T10">T10</option>
+          </select>
+          <label class="t-caption">Perfil de Correa</label>
+        </div>
+        <div class="input-group">
+          <input type="number" id="t-lon" placeholder=" " required oninput="calcTension()">
+          <label class="t-caption">Longitud Primitiva (mm)</label>
+        </div>
+        <div class="input-group">
+          <input type="number" id="t-ancho" placeholder=" " required oninput="calcTension()">
+          <label class="t-caption">Ancho de Correa (mm)</label>
+        </div>
+        <button class="btn-action t-heading" onclick="resetCorreas()">LIMPIAR CONFIGURACIÓN</button>
+      </div>
+    </aside>
+
+    <main class="col-right">
+      <div id="resultCard" class="result-block state-empty" style="max-width: 680px; width: 100%;">
+        <div class="t-micro">Frecuencia de Instalación Teórica</div>
+        <div style="margin: 16px 0;">
+          <span id="hzMain" class="val-main">--</span><span class="val-unit">Hz</span>
+        </div>
+        <div id="statusTxt" class="t-caption result-msg">Introduce los datos</div>
+        
+        <div class="grid-2 section-gap" style="border-top: 1px solid var(--border); padding-top: 24px;">
+          <div>
+            <div class="t-micro" style="color: var(--ok); margin-bottom: 6px;">Arranque Suave (Con Rampa)</div>
+            <div class="t-caption">Usada: <span id="r1-u" class="t-heading" style="font-size:14px;">--</span></div>
+            <div class="t-caption" style="margin-top:2px;">Nueva: <span id="r1-n" class="t-heading" style="font-size:14px;">--</span></div>
+          </div>
+          <div>
+            <div class="t-micro" style="color: var(--crit); margin-bottom: 6px;">Arranque Directo (Sin Rampa)</div>
+            <div class="t-caption">Usada: <span id="r2-u" class="t-heading" style="font-size:14px;">--</span></div>
+            <div class="t-caption" style="margin-top:2px;">Nueva: <span id="r2-n" class="t-heading" style="font-size:14px;">--</span></div>
+          </div>
+        </div>
+      </div>
+      
+      <footer style="margin-top: auto; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; max-width: 680px; width: 100%;">
+        <div class="t-micro">Amazon RME · RMU1 · © 2026 Óscar Litón Nevado. Todos los derechos reservados.</div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

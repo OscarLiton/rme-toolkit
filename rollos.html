@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rollos | RME Toolkit</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <div id="transition" class="page-transition"></div>
+
+  <header class="topbar" style="--tb-color: var(--accent-rollos)">
+    <div class="tb-zone">
+      <a href="index.html" class="t-display tb-logo">RMEHub</a>
+      <div class="tb-divider"></div>
+      <div class="tb-breadcrumb">Calculadora de Rollos</div>
+    </div>
+    <div class="tb-zone">
+      <div class="status-dot"></div>
+      <a href="index.html" class="btn-back">← <span class="back-text">Inicio</span></a>
+      <div class="avatar">OL</div>
+      <button class="mobile-toggle" onclick="toggleDrawer()">☰</button>
+    </div>
+  </header>
+
+  <div class="layout-main">
+    <aside class="col-left" id="drawer">
+      <div class="t-micro" style="padding: 16px;">Parámetros Geométricos</div>
+      <div style="padding: 0 16px; overflow-y: auto; flex: 1;">
+        <div class="input-group">
+          <input type="number" id="r-dext" placeholder=" " required step="any" oninput="calcRollos()">
+          <label class="t-caption">Ø Exterior Enrollado - D (mm)</label>
+        </div>
+        <div class="input-group">
+          <input type="number" id="r-dint" placeholder=" " required step="any" oninput="calcRollos()">
+          <label class="t-caption">Ø Interior Mandril - d (mm)</label>
+        </div>
+        <div class="input-group">
+          <input type="number" id="r-esp" placeholder=" " required step="any" oninput="calcRollos()">
+          <label class="t-caption">Espesor Nominal Banda - e (mm)</label>
+        </div>
+        <button class="btn-action t-heading" onclick="resetRollos()">LIMPIAR CONFIGURACIÓN</button>
+      </div>
+    </aside>
+
+    <main class="col-right">
+      <div class="grid-2" style="align-items: start; width: 100%; max-width: 900px;">
+        <div id="resultCard" class="result-block state-empty">
+          <div class="t-micro">Longitud Estimada de Banda (L)</div>
+          <div style="margin: 16px 0;">
+            <span id="r-resultado" class="val-main">--</span><span class="val-unit">m</span>
+          </div>
+          <div id="r-error" class="t-caption result-msg">Introduce los datos</div>
+          
+          <div class="grid-2 section-gap" style="border-top: 1px solid var(--border); padding-top: 20px;">
+            <div>
+              <div class="t-micro">Área Sección Transversal</div>
+              <div id="r-area" class="t-heading" style="font-size: 16px; margin-top: 4px;">--</div>
+            </div>
+            <div>
+              <div class="t-micro">Ratio Proporcional D/d</div>
+              <div id="r-ratio" class="t-heading" style="font-size: 16px; margin-top: 4px;">--</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-block state-empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 236px;">
+          <div class="t-micro" style="margin-bottom: 16px;">Telemetría de Espiral</div>
+          <svg id="r-svg" viewBox="0 0 100 100" style="width: 140px; height: 140px;">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+      
+      <footer style="margin-top: auto; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; max-width: 900px; width: 100%;">
+        <div class="t-micro">Amazon RME · RMU1 · © 2026 Óscar Litón Nevado. Todos los derechos reservados.</div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
