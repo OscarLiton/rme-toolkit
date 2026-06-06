@@ -76,7 +76,7 @@ chatForm.addEventListener('submit', async (e) => {
             throw new Error('Clave API no configurada');
         }
 
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
         const payload = {
             contents: [
                 {
