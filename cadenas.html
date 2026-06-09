@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadenas | RME Toolkit</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <div id="transition" class="page-transition"></div>
+
+  <header class="topbar" style="--tb-color: var(--accent-cadenas)">
+    <div class="tb-zone">
+      <a href="index.html" class="t-display tb-logo">RMEHub</a>
+      <div class="tb-divider"></div>
+      <div class="tb-breadcrumb">Calculadora de Cadenas</div>
+    </div>
+    <div class="tb-zone">
+      <div class="status-dot" role="img" aria-label="Base de datos en línea"></div>
+      <a href="index.html" class="btn-back">← <span class="back-text">Inicio</span></a>
+      <div class="avatar">OL</div>
+      <button class="mobile-toggle" onclick="toggleDrawer()" aria-label="Abrir menú">☰</button>
+    </div>
+  </header>
+
+  <div class="layout-main">
+    <aside class="col-left" id="drawer">
+      <div class="t-micro" style="padding: 16px 16px 8px 16px;">Selección de Cadena Activa</div>
+      <div id="chainListLeft" style="overflow-y: auto; flex: 1;"></div>
+    </aside>
+
+    <main class="col-right">
+      <div style="max-width: 600px; width: 100%;">
+      
+        <!-- FICHA DE PARÁMETROS DINÁMICA -->
+        <div id="chainParamsPanel" class="result-block" style="display: none; padding: 20px; background: var(--card2); margin-bottom: 24px; border-left: 4px solid var(--accent-cadenas);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+            <div>
+              <div id="cp-nombre" class="t-heading" style="font-size: 20px; text-transform: uppercase; line-height: 1.2;">--</div>
+              <div id="cp-ref" class="t-caption" style="font-size: 12px; letter-spacing: 1px; color: var(--text-disabled); margin-top: 4px;">--</div>
+            </div>
+            <div class="t-micro" style="background: rgba(255, 122, 92, 0.1); border: 1px solid rgba(255, 122, 92, 0.2); color: var(--accent-cadenas); padding: 4px 8px; border-radius: 4px;">
+              BBDD SHEETS
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid var(--border); padding-top: 16px;">
+            <div>
+              <div class="t-micro" style="margin-bottom: 4px;">Nominal (10 Esl.)</div>
+              <div id="cp-nom" class="t-heading" style="font-size: 16px;">-- mm</div>
+            </div>
+            <div>
+              <div class="t-micro" style="margin-bottom: 4px;">Límite Aviso</div>
+              <div id="cp-warn" class="t-heading" style="font-size: 16px; color: var(--warn);">-- %</div>
+            </div>
+            <div>
+              <div class="t-micro" style="margin-bottom: 4px;">Límite Crítico</div>
+              <div id="cp-crit" class="t-heading" style="font-size: 16px; color: var(--crit);">-- %</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <input type="number" id="measureInput" placeholder=" " required step="0.1" oninput="calculateChain(parseFloat(this.value))">
+          <label class="t-caption">Longitud Medida 10 Eslabones (mm)</label>
+        </div>
+      </div>
+
+      <div id="resultCard" class="result-block state-empty" style="max-width: 600px; width: 100%;">
+        <div class="t-micro">Elongación Registrada</div>
+        <div style="margin: 16px 0;">
+          <span id="resultPct" class="val-main">--</span><span class="val-unit">%</span>
+        </div>
+        <div id="statusTxt" class="t-caption result-msg">Introduce los datos</div>
+        
+        <div class="grid-2 section-gap">
+          <div>
+            <div class="t-micro">Nominal original</div>
+            <div id="statNominal" class="t-heading" style="font-size: 18px; margin-top:4px;">-- mm</div>
+          </div>
+          <div>
+            <div class="t-micro">Desviación Δ</div>
+            <div id="statDiff" class="t-heading" style="font-size: 18px; margin-top:4px;">-- mm</div>
+          </div>
+        </div>
+        <div class="section-gap" style="border-top: 1px solid var(--border); padding-top: 16px;">
+          <div class="t-micro">Límite Crítico Permitido</div>
+          <div id="statLimit" class="t-caption" style="margin-top: 4px; color: var(--text-main)">--</div>
+        </div>
+      </div>
+      
+      <footer style="margin-top: auto; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; max-width: 600px; width: 100%;">
+        <div class="t-micro">Amazon RME · RMU1 · © 2026 Óscar Litón Nevado. Todos los derechos reservados.</div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
+<style>
+/* ── HELP PANEL ── */
+.help-fab { position: fixed; bottom: 24px; right: 24px; width: 48px; height: 48px; border-radius: 50%; background: var(--accent-cadenas); border: none; color: white; font-size: 20px; cursor: pointer; z-index: 200; box-shadow: 0 4px 16px rgba(255,122,92,0.4); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
+.help-fab:hover { transform: scale(1.1); }
+.help-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.help-overlay.open { opacity: 1; pointer-events: all; }
+.help-panel { position: fixed; right: 0; top: 0; bottom: 0; width: min(420px, 100vw); background: var(--bg); border-left: 1px solid var(--border); z-index: 400; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); overflow-y: auto; display: flex; flex-direction: column; }
+.help-panel.open { transform: translateX(0); }
+.help-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--card); flex-shrink: 0; }
+.help-header h2 { font-family: var(--font-display); font-size: 20px; font-weight: 900; text-transform: uppercase; color: var(--accent-cadenas); }
+.help-close { background: none; border: 1px solid var(--border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.help-close:hover { border-color: var(--crit); color: var(--crit); }
+.help-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.help-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.help-section-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.help-section-header span { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-disabled); }
+.help-section-header h3 { font-family: var(--font-display); font-size: 15px; font-weight: 900; text-transform: uppercase; color: var(--text-main); flex: 1; }
+.help-section-body { padding: 16px; font-family: var(--font-body); font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+.help-section-body ul { margin-left: 14px; }
+.help-section-body li { margin-bottom: 5px; }
+.help-section-body strong { color: var(--amz); }
+.help-alert { padding: 10px 14px; border-radius: 6px; margin: 8px 0; font-size: 12px; line-height: 1.5; border-left: 3px solid; }
+.help-alert.danger { background: rgba(248,81,73,0.08); border-color: var(--crit); color: #fca5a5; }
+.help-alert.warning { background: rgba(210,153,34,0.08); border-color: var(--warn); color: #fcd34d; }
+.help-alert.info { background: rgba(96,165,250,0.08); border-color: #60a5fa; color: #93c5fd; }
+.help-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+.help-table th { background: var(--card2); padding: 8px 10px; text-align: left; font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-cadenas); border-bottom: 1px solid var(--border); }
+.help-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+.help-table td strong { color: var(--text-main); }
+.help-table tr:last-child td { border-bottom: none; }
+.step-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-cadenas); color: #000; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-right: 8px; }
+</style>
+
+<!-- HELP FAB -->
+<button class="help-fab" onclick="toggleHelp()" title="Ayuda técnica">?</button>
+
+<!-- OVERLAY -->
+<div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+
+<!-- PANEL -->
+<div class="help-panel" id="helpPanel">
+  <div class="help-header">
+    <h2>📖 Guía · Cadenas</h2>
+    <button class="help-close" onclick="toggleHelp()">✕</button>
+  </div>
+  <div class="help-body">
+
+    <!-- CÓMO USAR -->
+    <div class="help-section">
+      <div class="help-section-header">
+        <span>01</span><h3>Cómo usar la calculadora</h3>
+      </div>
+      <div class="help-section-body">
+        <ul>
+          <li><span class="step-num">1</span>Selecciona el tipo de cadena en el panel izquierdo.</li>
+          <li><span class="step-num">2</span>Mide <strong>10 eslabones consecutivos</strong> con calibre en la cadena bajo tensión.</li>
+          <li><span class="step-num">3</span>Introduce la medición en mm en el campo de entrada.</li>
+          <li><span class="step-num">4</span>El resultado aparece automáticamente con el estado de la cadena.</li>
+        </ul>
+        <div class="help-alert info"><strong>💡 TIP DE MEDICIÓN</strong>Medir siempre en el tramo de cadena bajo carga, no en el tramo libre. Evita medir cerca de los empalmes.</div>
+      </div>
+    </div>
+
+    <!-- ESTADOS -->
+    <div class="help-section">
+      <div class="help-section-header">
+        <span>02</span><h3>Interpretación de resultados</h3>
+      </div>
+      <div class="help-section-body">
+        <table class="help-table">
+          <thead><tr><th>Estado</th><th>Color</th><th>Acción</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Óptimo</strong></td><td>Verde</td><td>Sin intervención requerida</td></tr>
+            <tr><td><strong>Alerta</strong></td><td>Amarillo</td><td>Planificar sustitución</td></tr>
+            <tr><td><strong>CRÍTICO</strong></td><td>Rojo parpadeante</td><td><strong>Sustituir inmediatamente</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DATOS TÉCNICOS -->
+    <div class="help-section">
+      <div class="help-section-header">
+        <span>03</span><h3>Referencia técnica · Espirales</h3>
+      </div>
+      <div class="help-section-body">
+        <table class="help-table">
+          <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+          <tbody>
+            <tr><td>Medida nominal (10 esl.)</td><td><strong>381.2 mm</strong></td></tr>
+            <tr><td>Límite aviso</td><td><strong>384.0 mm (≈+0.7%)</strong></td></tr>
+            <tr><td>Límite crítico</td><td><strong>387.0 mm (≈+1.5%)</strong></td></tr>
+            <tr><td>Herramienta medición</td><td>Calibre digital o pie de rey</td></tr>
+            <tr><td>Punto de medición</td><td>Tramo bajo carga</td></tr>
+            <tr><td>Frecuencia control</td><td>Preventivo periódico</td></tr>
+          </tbody>
+        </table>
+        <div class="help-alert warning"><strong>⚠️ SUSTITUCIÓN</strong>Al alcanzar el límite crítico, la cadena puede saltar de los sprockets causando daños graves en el equipo y riesgo para el técnico.</div>
+      </div>
+    </div>
+
+    <!-- PROCEDIMIENTO -->
+    <div class="help-section">
+      <div class="help-section-header">
+        <span>04</span><h3>Protocolo de medición</h3>
+      </div>
+      <div class="help-section-body">
+        <ul>
+          <li>LOTO eléctrico antes de acceder a la cadena.</li>
+          <li>Limpiar el tramo a medir de grasa y suciedad.</li>
+          <li>Medir siempre los <strong>mismos 10 eslabones</strong> marcados (consistencia).</li>
+          <li>Registrar el valor en el sistema de tracking.</li>
+          <li>Si supera el aviso: <strong>informar al responsable</strong> y programar sustitución.</li>
+        </ul>
+        <div class="help-alert danger"><strong>🔴 NUNCA</strong>No medir con la máquina en marcha. No introducir herramientas en zonas de paso de cadena sin LOTO aplicado.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleHelp() {
+  document.getElementById('helpPanel').classList.toggle('open');
+  document.getElementById('helpOverlay').classList.toggle('open');
+}
+</script>
