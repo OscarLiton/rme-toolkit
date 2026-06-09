@@ -1,14 +1,20 @@
 /* ==========================================================================
-   RME TOOLKIT - ENGINE & STATE CONTROLLER
+   RME TOOLKIT - ENGINE & STATE CONTROLLER (V3 - REALTIME SPREADSHEETS SYNC)
    ========================================================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const transition = document.getElementById("transition");
     if (transition) {
         setTimeout(() => transition.classList.add("fade-out"), 50);
     }
-    loadCadenas();
-    loadRecetas();
+    
+    // Disparamos la carga paralela de bases de datos
+    Promise.all([
+        loadCadenas(),
+        loadRecetas(),
+        loadCBMData(),
+        loadAsistenteSoldaduraData()
+    ]).catch(err => console.error("Error en sincronización principal:", err));
 });
 
 document.addEventListener("click", (e) => {
@@ -46,8 +52,11 @@ function animateValue(id, start, end, duration, decimal = false) {
     window.requestAnimationFrame(step);
 }
 
+// === CONSTANTES DE CONEXIÓN CON GOOGLE SHEETS ===
 const GS_CADENAS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxP6CvEd7nJjKETcJbZADsqNhwcp9lroWUQ1OyLfCFqQfq0h25YJOkRqMWbRm0x_MYjU288JV2c4X3/pub?gid=0&single=true&output=csv';
 const GS_RECETAS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxP6CvEd7nJjKETcJbZADsqNhwcp9lroWUQ1OyLfCFqQfq0h25YJOkRqMWbRm0x_MYjU288JV2c4X3/pub?gid=1759976857&single=true&output=csv';
+const GS_ASISTENTE_SOLDADURA = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxP6CvEd7nJjKETcJbZADsqNhwcp9lroWUQ1OyLfCFqQfq0h25YJOkRqMWbRm0x_MYjU288JV2c4X3/pub?gid=71524182&single=true&output=csv';
+const GS_CBM = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxP6CvEd7nJjKETcJbZADsqNhwcp9lroWUQ1OyLfCFqQfq0h25YJOkRqMWbRm0x_MYjU288JV2c4X3/pub?gid=1496090841&single=true&output=csv';
 
 function parseCSV(text) {
     const lines = text.trim().split(/\r?\n/);
@@ -67,6 +76,53 @@ function parseCSV(text) {
         return obj;
     });
 }
+
+/* ── PREDICTIVO CBM MODULE CONTROLLER ── */
+let cbmList = [];
+
+async function loadCBMData() {
+    const grid = document.getElementById('cbmGrid');
+    if (!grid) return; 
+    try {
+        const res = await fetch(GS_CBM);
+        const text = await res.text();
+        cbmList = parseCSV(text);
+        renderCBM(cbmList);
+    } catch (e) {
+        grid.innerHTML = `<div class="t-caption" style="grid-column:1/-1; padding:24px; text-align:center;">Error sincronizando CBM con Google Sheets</div>`;
+    }
+}
+
+function renderCBM(data) {
+    const grid = document.getElementById('cbmGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    if(data.length === 0) {
+        grid.innerHTML = '<div class="t-caption" style="grid-column: 1/-1; padding: 40px; text-align: center;">No se han encontrado nomenclaturas con esa búsqueda.</div>';
+        return;
+    }
+
+    grid.innerHTML = data.map(r => `
+        <div class="cbm-card">
+            <div class="cbm-header">
+                <span class="cbm-new">${r.codigo_nuevo || 'N/A'}</span>
+                <span class="cbm-old">Antiguo: ${r.codigo_antiguo || 'N/A'}</span>
+            </div>
+            <div class="cbm-desc">${r.descripcion || 'Sin descripción'}</div>
+        </div>
+    `).join('');
+}
+
+window.filterCBM = () => {
+    const query = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const filtered = cbmList.filter(item => 
+        (item.codigo_nuevo || '').toLowerCase().includes(query) || 
+        (item.codigo_antiguo || '').toLowerCase().includes(query) || 
+        (item.descripcion || '').toLowerCase().includes(query)
+    );
+    renderCBM(filtered);
+};
 
 /* ── CADENAS MODULE CONTROLLER ── */
 let chains = [];
@@ -98,13 +154,11 @@ function selectChain(index) {
         if(i === index) r.style.setProperty('--band-color', 'var(--accent-cadenas)');
     });
     
-    // Panel de parámetros en la pantalla derecha
     const infoPanel = document.getElementById('chainParamsPanel');
     if (infoPanel) {
         infoPanel.style.display = 'block';
-        // Animación suave al cambiar de cadena
         infoPanel.style.animation = 'none';
-        infoPanel.offsetHeight; // trigger reflow
+        infoPanel.offsetHeight; 
         infoPanel.style.animation = 'cardEntry 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
         
         document.getElementById('cp-nombre').textContent = selectedChain.nombre || 'Cadena';
@@ -118,8 +172,10 @@ function selectChain(index) {
     if (input && input.value) {
         calculateChain(parseFloat(input.value));
     } else {
-        calculateChain(NaN); // Fuerza la carga de datos en la tarjeta inferior si no hay medición aún
+        calculateChain(NaN);
     }
+
+    if (window.innerWidth <= 900) { toggleDrawer(); }
 }
 
 function calculateChain(val) {
@@ -182,7 +238,6 @@ window.calcTension = () => {
         rc.className = "result-block state-empty";
         document.getElementById('hzMain').textContent = "--";
         
-        // Reset sub-values
         document.getElementById('r1-u').textContent = '--';
         document.getElementById('r1-n').textContent = '--';
         document.getElementById('r2-u').textContent = '--';
@@ -198,7 +253,7 @@ window.calcTension = () => {
         const {paso, peso} = perfiles[perf];
         const d1 = (z1*paso)/Math.PI;
         const d2 = (z2*paso)/Math.PI;
-        const v = (z1*paso*rpm)/(60*1000);
+        const v = (z1*paso*rpm)/(60*1000); 
         const tmp = lon - (Math.PI/2)*(d1+d2);
         const rad = Math.pow(tmp,2) - 2*Math.pow(d1-d2,2);
 
@@ -208,15 +263,17 @@ window.calcTension = () => {
             return;
         }
 
-        const C = 0.25*(tmp+Math.sqrt(rad));
-        const Ls = Math.sqrt(Math.pow(C,2)-Math.pow((d1-d2)/2,2))/1000;
+        const C = 0.25*(tmp+Math.sqrt(rad)); 
+        const Ls = Math.sqrt(Math.pow(C,2)-Math.pow((d1-d2)/2,2))/1000; 
         const m = ancho*peso;
         
         const Te1 = (p*1.0*1000)/v;
         const hzIdeal = Math.sqrt((Te1*.75)/(4*m*Math.pow(Ls,2)));
 
+        const torque = (pNominal * 9550) / rpm;
+
         rc.className = "result-block state-ok";
-        document.getElementById('statusTxt').textContent = "Frecuencias Calculadas";
+        document.getElementById('statusTxt').textContent = `Frecuencias e Ingeniería Calculadas`;
         
         const calcHz = (factor, cond) => Math.sqrt(((p*factor*1000)/v)*cond/(4*m*Math.pow(Ls,2))).toFixed(1);
         
@@ -224,6 +281,14 @@ window.calcTension = () => {
         document.getElementById('r1-n').textContent = `${calcHz(1.0, 0.85)} Hz`;
         document.getElementById('r2-u').textContent = `${calcHz(1.5, 0.7)} Hz`;
         document.getElementById('r2-n').textContent = `${calcHz(1.5, 0.85)} Hz`;
+
+        const statusPanel = document.getElementById('statusTxt');
+        if (statusPanel) {
+            statusPanel.innerHTML = `Frecuencias Calculadas <br>
+            <span style="font-size:11px; font-family:var(--font-mono); color:var(--text-muted);">
+                Ejes (C): <strong>${C.toFixed(1)} mm</strong> | Par Motor: <strong>${torque.toFixed(2)} Nm</strong>
+            </span>`;
+        }
 
         animateValue('hzMain', 0, hzIdeal, 200, false);
     }, 300);
@@ -526,6 +591,8 @@ window.selectRecipe = (bandaId) => {
           <div class="t-micro">Amazon RME · RMU1 · © 2026 Óscar Litón Nevado. Todos los derechos reservados.</div>
         </footer>
     `;
+
+    if (window.innerWidth <= 900) { toggleDrawer(); }
 };
 
 /* ── ROLLOS MODULE CONTROLLER ── */
@@ -536,6 +603,9 @@ window.calcRollos = () => {
     const D = parseFloat(document.getElementById('r-dext')?.value);
     const d = parseFloat(document.getElementById('r-dint')?.value);
     const e = parseFloat(document.getElementById('r-esp')?.value);
+    
+    const factorElement = document.getElementById('r-factor');
+    const Kc = factorElement ? parseFloat(factorElement.value) : 1.0;
 
     if (isNaN(D) || isNaN(d) || isNaN(e) || e <= 0 || D <= d) {
         rc.className = "result-block state-empty";
@@ -546,11 +616,13 @@ window.calcRollos = () => {
 
     rc.className = "result-block state-loading";
     setTimeout(() => {
-        const area = Math.PI * (Math.pow(D/2, 2) - Math.pow(d/2, 2));
-        const L = area / e / 1000;
+        let area = Math.PI * (Math.pow(D/2, 2) - Math.pow(d/2, 2));
+        area = area * Kc; 
+        
+        const L = area / e / 1000; 
 
         rc.className = "result-block state-ok";
-        document.getElementById('r-error').textContent = "Cálculo Exitoso";
+        document.getElementById('r-error').textContent = Kc < 1.0 ? `Cálculo con corrección del ${( (1-Kc)*100 ).toFixed(0)}% por holgura` : "Cálculo Geométrico Exitoso";
         document.getElementById('r-area').textContent = `${area.toFixed(1)} mm²`;
         document.getElementById('r-ratio').textContent = (D/d).toFixed(2);
         
@@ -576,3 +648,108 @@ window.resetRollos = () => {
     ['r-dext','r-dint','r-esp'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
     window.calcRollos();
 };
+
+/* ── ASISTENTE DE SOLDADURA DINÁMICO ── */
+let PHASES_DB = {}; 
+let TIPS_CONTENT_DB = ""; 
+
+async function loadAsistenteSoldaduraData() {
+    try {
+        const res = await fetch(GS_ASISTENTE_SOLDADURA);
+        const text = await res.text();
+        const rows = parseCSV(text);
+        
+        PHASES_DB = {
+            conv: [], sdi_gen: [], sdi_amm: [], sdi_for: [],
+            arp: [], c900: [], aero: [], ndx: [], punm: []
+        };
+
+        rows.forEach(row => {
+            const mod = row['modulo'];
+            if (!PHASES_DB[mod]) PHASES_DB[mod] = [];
+
+            let pasosHtml = "";
+            if (row['pasos_lista']) {
+                const pasos = row['pasos_lista'].split(';').map(p => p.trim()).filter(Boolean);
+                pasosHtml = `<ol class="step-list">` + pasos.map(p => `<li>${p}</li>`).join('') + `</ol>`;
+            }
+
+            let alertaHtml = "";
+            if (row['alert_type'] && row['alert_text']) {
+                alertaHtml = `
+                    <div class="alert-box alert-${row['alert_type']}">
+                        <strong>${row['alert_title'] || 'AVISO TÉCNICO'}</strong>
+                        ${row['alert_text']}
+                    </div>`;
+            }
+
+            let tablaHtml = "";
+            if (row['tabla_datos']) {
+                const lineasTabla = row['tabla_datos'].split('\n').map(l => l.trim()).filter(Boolean);
+                if (lineasTabla.length > 0) {
+                    const cabecera = lineasTabla[0].split('|').map(c => `<th>${c.trim()}</th>`).join('');
+                    const cuerpo = lineasTabla.slice(1).map(l => {
+                        const celdas = l.split('|').map(c => `<td>${c.trim()}</td>`).join('');
+                        return `<tr>${celdas}</tr>`;
+                    }).join('');
+                    
+                    tablaHtml = `<table class="info-table"><thead><tr>${cabecera}</tr></thead><tbody>${cuerpo}</tbody></table>`;
+                }
+            }
+
+            PHASES_DB[mod].push({
+                id: row['fase_id'],
+                label: row['label'],
+                color: row['color'] || 'var(--amz)',
+                content: `
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <span class="phase-badge">${row['badge'] || 'MANUAL'}</span>
+                            <h3>${row['titulo'] || 'Especificación Técnica'}</h3>
+                        </div>
+                        <div class="content-card-body">
+                            ${alertaHtml}
+                            ${pasosHtml}
+                            ${tablaHtml}
+                        </div>
+                    </div>`
+            });
+        });
+
+        buildTipsPlantaDB(rows);
+
+    } catch (e) {
+        console.error("Error crítico sincronizando el Asistente Técnico:", e);
+    }
+}
+
+function buildTipsPlantaDB(rows) {
+    let html = "";
+    const modulosUnicos = [...new Set(rows.map(r => r.modulo))];
+    
+    const aliasModulos = {
+        conv: "Bandas Convencionales", sdi_gen: "SDI Sorter General", 
+        sdi_amm: "SDI Ammeraal", sdi_for: "SDI Forbo", arp: "Sistemas ARP / LR", 
+        c900: "Cortadora Serie 900", aero: "Prensa Novitool Aero", 
+        ndx: "NDX PUN M™", punm: "Pun M™ Perforadora"
+    };
+
+    modulosUnicos.forEach(m => {
+        const alertasCriticas = rows.filter(r => r.modulo === m && (r.alert_type === 'danger' || r.alert_type === 'warning'));
+        if (alertasCriticas.length > 0) {
+            html += `
+                <div class="content-card" style="margin-bottom:14px">
+                    <div class="content-card-header">
+                        <span class="phase-badge" style="background:rgba(255,153,0,0.08); color:var(--amz); border-color:rgba(255,153,0,0.2)">CRÍTICO</span>
+                        <h3>${aliasModulos[m] || m.toUpperCase()}</h3>
+                    </div>
+                    <div class="content-card-body">
+                        <ul style="margin-left:14px;">
+                            ${alertasCriticas.map(a => `<li><strong>${a.alert_title}:</strong> ${a.alert_text}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>`;
+        }
+    });
+    TIPS_CONTENT_DB = html || "<div class='t-caption' style='text-align:center; padding:24px;'>No existen alertas de seguridad registradas en la nube.</div>";
+}

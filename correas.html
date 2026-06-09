@@ -102,3 +102,119 @@
   <script src="main.js"></script>
 </body>
 </html>
+<style>
+.help-fab { position: fixed; bottom: 24px; right: 24px; width: 48px; height: 48px; border-radius: 50%; background: var(--accent-correas); border: none; color: white; font-size: 20px; cursor: pointer; z-index: 200; box-shadow: 0 4px 16px rgba(96,165,250,0.4); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
+.help-fab:hover { transform: scale(1.1); }
+.help-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.help-overlay.open { opacity: 1; pointer-events: all; }
+.help-panel { position: fixed; right: 0; top: 0; bottom: 0; width: min(420px, 100vw); background: var(--bg); border-left: 1px solid var(--border); z-index: 400; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); overflow-y: auto; display: flex; flex-direction: column; }
+.help-panel.open { transform: translateX(0); }
+.help-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--card); flex-shrink: 0; }
+.help-header h2 { font-family: var(--font-display); font-size: 20px; font-weight: 900; text-transform: uppercase; color: var(--accent-correas); }
+.help-close { background: none; border: 1px solid var(--border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.help-close:hover { border-color: var(--crit); color: var(--crit); }
+.help-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.help-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.help-section-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.help-section-header span { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-disabled); }
+.help-section-header h3 { font-family: var(--font-display); font-size: 15px; font-weight: 900; text-transform: uppercase; color: var(--text-main); flex: 1; }
+.help-section-body { padding: 16px; font-family: var(--font-body); font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+.help-section-body ul { margin-left: 14px; }
+.help-section-body li { margin-bottom: 5px; }
+.help-section-body strong { color: var(--amz); }
+.help-alert { padding: 10px 14px; border-radius: 6px; margin: 8px 0; font-size: 12px; line-height: 1.5; border-left: 3px solid; }
+.help-alert.danger { background: rgba(248,81,73,0.08); border-color: var(--crit); color: #fca5a5; }
+.help-alert.warning { background: rgba(210,153,34,0.08); border-color: var(--warn); color: #fcd34d; }
+.help-alert.info { background: rgba(96,165,250,0.08); border-color: #60a5fa; color: #93c5fd; }
+.help-alert.success { background: rgba(63,185,80,0.08); border-color: var(--ok); color: #86efac; }
+.help-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+.help-table th { background: var(--card2); padding: 8px 10px; text-align: left; font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-correas); border-bottom: 1px solid var(--border); }
+.help-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+.help-table td strong { color: var(--text-main); }
+.help-table tr:last-child td { border-bottom: none; }
+</style>
+
+<button class="help-fab" onclick="toggleHelp()" title="Ayuda técnica">?</button>
+<div class="help-overlay" id="helpOverlay" onclick="toggleHelp()"></div>
+
+<div class="help-panel" id="helpPanel">
+  <div class="help-header">
+    <h2>📖 Guía · Correas</h2>
+    <button class="help-close" onclick="toggleHelp()">✕</button>
+  </div>
+  <div class="help-body">
+
+    <div class="help-section">
+      <div class="help-section-header"><span>01</span><h3>Cómo usar la calculadora</h3></div>
+      <div class="help-section-body">
+        <ul>
+          <li>Introduce la <strong>potencia del motor en kW</strong>.</li>
+          <li>Ajusta la <strong>carga operativa %</strong> (por defecto 100%).</li>
+          <li>Introduce las <strong>RPM de la polea motriz</strong>.</li>
+          <li>Nº de dientes de polea motriz (z1) y conducida (z2).</li>
+          <li>Selecciona el <strong>perfil de correa</strong> del desplegable.</li>
+          <li>Longitud primitiva en mm y ancho de correa en mm.</li>
+          <li>El resultado en <strong>Hz</strong> aparece automáticamente.</li>
+        </ul>
+        <div class="help-alert info"><strong>💡 DÓNDE ENCONTRAR LOS DATOS</strong>La placa de características del motor tiene kW y RPM. El perfil y longitud primitiva están grabados en el lateral de la correa.</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-header"><span>02</span><h3>Interpretación de resultados</h3></div>
+      <div class="help-section-body">
+        <table class="help-table">
+          <thead><tr><th>Resultado</th><th>Qué significa</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Hz principal</strong></td><td>Frecuencia teórica ideal de instalación</td></tr>
+            <tr><td><strong>Con rampa · Usada</strong></td><td>Hz para correa ya asentada con arranque suave</td></tr>
+            <tr><td><strong>Con rampa · Nueva</strong></td><td>Hz para correa nueva con arranque suave</td></tr>
+            <tr><td><strong>Sin rampa · Usada</strong></td><td>Hz para correa usada con arranque directo</td></tr>
+            <tr><td><strong>Sin rampa · Nueva</strong></td><td>Hz para correa nueva con arranque directo</td></tr>
+          </tbody>
+        </table>
+        <div class="help-alert success"><strong>✓ CÓMO MEDIR EN PLANTA</strong>Usar vibrómetro o app de frecuencia. Golpear la correa en el tramo libre y comparar con el Hz calculado. Ajustar tensión hasta igualar.</div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-header"><span>03</span><h3>Referencia · Perfiles de correa</h3></div>
+      <div class="help-section-body">
+        <table class="help-table">
+          <thead><tr><th>Perfil</th><th>Paso</th><th>Uso típico</th></tr></thead>
+          <tbody>
+            <tr><td><strong>3M</strong></td><td>3 mm</td><td>Motores pequeños, encoders</td></tr>
+            <tr><td><strong>5M</strong></td><td>5 mm</td><td>Accionamientos medios</td></tr>
+            <tr><td><strong>8M</strong></td><td>8 mm</td><td>Transportadores medianos</td></tr>
+            <tr><td><strong>14M</strong></td><td>14 mm</td><td>Alta potencia, carga pesada</td></tr>
+            <tr><td><strong>T5</strong></td><td>5 mm</td><td>Precisión, bajo ruido</td></tr>
+            <tr><td><strong>T10</strong></td><td>10 mm</td><td>Precisión media-alta carga</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-header"><span>04</span><h3>Protocolo de instalación</h3></div>
+      <div class="help-section-body">
+        <ul>
+          <li>LOTO eléctrico antes de cualquier intervención.</li>
+          <li>Limpiar poleas de restos de la correa vieja.</li>
+          <li>Instalar la correa nueva <strong>sin herramientas de palanca</strong>.</li>
+          <li>Ajustar la distancia entre centros hasta la frecuencia calculada.</li>
+          <li>Arrancar en vacío 5 minutos y <strong>re-verificar Hz</strong>.</li>
+        </ul>
+        <div class="help-alert warning"><strong>⚠️ TENSIÓN EXCESIVA</strong>Una correa sobretensada reduce la vida útil de los rodamientos del motor. Una infratensada salta y dañará la transmisión.</div>
+        <div class="help-alert danger"><strong>🔴 NUNCA</strong>No ajustar la tensión con la máquina en marcha.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleHelp() {
+  document.getElementById('helpPanel').classList.toggle('open');
+  document.getElementById('helpOverlay').classList.toggle('open');
+}
+</script>

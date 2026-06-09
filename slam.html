@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S.L.A.M. | RME Toolkit</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    .slam-dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 1100px;
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    .image-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 24px;
+    }
+
+    .image-panel img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+      border: 1px solid var(--border2);
+    }
+
+    .info-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .data-card {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .data-card:hover {
+      border-color: #8b5cf6;
+    }
+
+    .dc-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .dc-icon {
+      font-size: 18px;
+    }
+
+    .dc-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--text-main);
+      letter-spacing: 0.5px;
+    }
+
+    .data-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed rgba(255,255,255,0.05);
+    }
+    .data-row:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .dr-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-disabled);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .dr-value {
+      font-family: var(--font-heading);
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .dr-value strong {
+      color: var(--text-main);
+    }
+
+    .tag-color {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .slam-dashboard {
+        grid-template-columns: 1fr;
+      }
+      .image-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="transition" class="page-transition"></div>
+
+  <header class="topbar" style="--tb-color: #8b5cf6">
+    <div class="tb-zone">
+      <a href="index.html" class="t-display tb-logo">RMEHub</a>
+      <div class="tb-divider"></div>
+      <div class="tb-breadcrumb">S.L.A.M. Toolkit</div>
+    </div>
+    <div class="tb-zone">
+      <div class="status-dot"></div>
+      <a href="index.html" class="btn-back">← <span class="back-text">Inicio</span></a>
+      <div class="avatar">OL</div>
+      <button class="mobile-toggle" onclick="toggleDrawer()">☰</button>
+    </div>
+  </header>
+
+  <div class="layout-main">
+    <aside class="col-left" id="drawer">
+      <div class="t-micro" style="padding: 16px 16px 8px 16px;">Módulos S.L.A.M.</div>
+      <div style="overflow-y: auto; flex: 1;">
+        <div class="compact-row active" style="--band-color: #8b5cf6">
+          <div class="color-dot" style="--dot-color: #8b5cf6"></div>
+          <div style="flex:1" class="t-heading">Etiqueta Kick-Out</div>
+          <div class="t-caption" style="font-size:11px;">Análisis visual</div>
+        </div>
+        <div class="compact-row" style="opacity: 0.4; cursor: default;">
+          <div class="color-dot" style="--dot-color: var(--text-disabled)"></div>
+          <div style="flex:1" class="t-heading">Calibración Escáner</div>
+          <div class="t-caption" style="font-size:11px;">Próximamente</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="col-right">
+      <div style="margin-bottom: 24px;">
+        <h1 class="t-display" style="font-size: 32px; color: var(--text-main); margin-bottom: 4px;">Análisis de Etiqueta de Rechazo (KO)</h1>
+        <p class="t-caption">Interpretación de parámetros para resolución de Trouble Tickets en S.L.A.M.</p>
+      </div>
+
+      <div class="slam-dashboard">
+        
+        <div class="image-panel">
+          <div class="t-micro" style="margin-bottom: 12px; color: #8b5cf6;">Muestra de Etiqueta FAST TRACK</div>
+          <img src="etiqueta_slam.jpg" alt="Desglose Etiqueta SLAM KO">
+        </div>
+
+        <div class="info-panel">
+          
+          <div class="data-card">
+            <div class="dc-header">
+              <span class="dc-icon">📍</span>
+              <h2 class="dc-title">Identificación de Estación (Station ID)</h2>
+            </div>
+            <p class="t-caption" style="margin-bottom: 16px; font-size: 12px;">Estructura del código de 4 dígitos (Ejemplo: <strong>3052</strong>)</p>
+            
+            <div class="data-row">
+              <div class="dr-label"><span class="tag-color" style="background: purple;"></span>Dígito 1 (Morado)</div>
+              <div class="dr-value"><strong>Planta / Zona Lógica</strong>. Identifica la ubicación macro del equipo dentro de RMU1 (ej. Planta 3).</div>
+            </div>
+            <div class="data-row">
+              <div class="dr-label"><span class="tag-color" style="background: green;"></span><span class="tag-color" style="background: red;"></span>Dígitos 2 y 3 (Verde y Rojo)</div>
+              <div class="dr-value"><strong>SLAM No.</strong> Número de la línea S.L.A.M. física (ej. S.L.A.M. 05).</div>
+            </div>
+            <div class="data-row">
+              <div class="dr-label"><span class="tag-color" style="background: #3b82f6;"></span>Dígito 4 (Azul)</div>
+              <div class="dr-value"><strong>Printhead No.</strong> Número del cabezal impresor o aplicador específico que emitió la etiqueta (ej. Cabezal 2).</div>
+            </div>
+          </div>
+
+          <div class="data-card">
+            <div class="dc-header">
+              <span class="dc-icon">⏱️</span>
+              <h2 class="dc-title">Trazabilidad de Tiempo</h2>
+            </div>
+            <div class="data-row">
+              <div class="dr-label">ExSD / CPT Time</div>
+              <div class="dr-value"><strong>Critical Pull Time.</strong> Fecha y hora límite en la que el paquete debe estar inyectado en el camión para cumplir la promesa al cliente.</div>
+            </div>
+            <div class="data-row">
+              <div class="dr-label">KO Date</div>
+              <div class="dr-value"><strong>Kick-Out Date.</strong> Momento exacto en el que el escáner rechazó el paquete y aplicó la etiqueta de error.</div>
+            </div>
+          </div>
+
+          <div class="data-card">
+            <div class="dc-header">
+              <span class="dc-icon">⚠️</span>
+              <h2 class="dc-title">Diagnóstico de Error (Ticketing)</h2>
+            </div>
+            <div class="data-row">
+              <div class="dr-label">SP00 Label ID</div>
+              <div class="dr-value"><strong>ScanID.</strong> Código de barras único del paquete (SP00...). Indispensable para buscar el histórico en los sistemas internos.</div>
+            </div>
+            <div class="data-row">
+              <div class="dr-label">Ticket C/T/I</div>
+              <div class="dr-value"><strong>Category / Type / Item.</strong> Ruta de clasificación que S.L.A.M. utiliza para auto-asignar el Trouble Ticket al departamento correcto (ej. Software).</div>
+            </div>
+            <div class="data-row">
+              <div class="dr-label">Error Code & Description</div>
+              <div class="dr-value"><strong>Razón del Rechazo.</strong> Detalle técnico del fallo. <em>(En la imagen: AutoSlam did not find all the hazmat barcodes required)</em>. Falta de lectura de etiquetas de mercancía peligrosa (Hazmat).</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
+      <footer style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
+        <div class="t-micro">Amazon RME · RMU1 · © 2026 Óscar Litón Nevado. Todos los derechos reservados.</div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
