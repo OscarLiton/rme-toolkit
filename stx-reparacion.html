@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro Reparación STX.M · RMU1</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
+<style>
+  /* ─── HMI INDUSTRIAL REDESIGN ──────────────────────────────── */
+  :root {
+    --amz-dim: #cc7a00; --amz-glow: rgba(255,153,0,0.18);
+    --glass: rgba(255,255,255,0.04); --glass-border: rgba(255,255,255,0.08);
+    --ko: #ef4444; --medida: #0ea5e9; --medida-bg: rgba(14, 165, 233, 0.15);
+  }
+  body { overflow-y: auto !important; background: #07101e; padding-bottom: 60px; }
+
+  /* Progress & Header */
+  .progress-wrap { background: var(--card); padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; position: sticky; top: var(--topbar-h); z-index: 90; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+  .progress-track { flex: 1; height: 4px; background: var(--bg); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--amz-dim), var(--amz)); width: 0%; transition: width 0.3s ease; }
+  .progress-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-disabled); white-space: nowrap; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* Section Headers */
+  .section-header { display: flex; align-items: center; gap: 14px; margin: 32px 0 16px; }
+  .section-tag { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--amz); background: var(--amz-glow); border: 1px solid var(--amz); padding: 4px 10px; border-radius: 6px; }
+  .section-title { font-family: var(--font-display); font-size: 24px; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-main); }
+  .section-divider { flex: 1; height: 1px; background: var(--border); }
+
+  /* Split Layout for Sticky Images */
+  .split-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+  .split-content { display: flex; flex-direction: column; gap: 16px; }
+  .split-image-panel { position: sticky; top: 120px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+  .split-image-panel img { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border2); display: block; }
+  .img-caption { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-align: center; padding: 4px; }
+  
+  @media (max-width: 900px) {
+    .split-layout { grid-template-columns: 1fr; }
+    .split-image-panel { position: relative; top: 0; margin-bottom: 16px; }
+  }
+
+  /* Cards & Grid Buttons */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; transition: border-color 0.2s; position: relative; overflow: hidden; }
+  .card:focus-within { border-color: var(--amz); }
+  
+  .hmi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 6px; }
+  .hmi-grid.small { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
+  .hmi-btn { background: var(--card2); border: 2px solid var(--border-field); border-radius: 8px; padding: 12px 8px; cursor: pointer; transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; user-select: none; }
+  .hmi-btn input[type="radio"] { display: none; }
+  .hmi-btn:active { transform: scale(0.97); }
+  .hmi-icon { font-size: 20px; line-height: 1; margin-bottom: 2px; }
+  .hmi-text { font-family: var(--font-heading); font-size: 11px; font-weight: 700; color: var(--text-muted); line-height: 1.2; text-transform: uppercase; }
+
+  .hmi-btn.selected-ok { background: rgba(63,185,80,0.1); border-color: var(--ok); box-shadow: inset 0 0 12px rgba(63,185,80,0.2); }
+  .hmi-btn.selected-ok .hmi-text { color: var(--ok); }
+  .hmi-btn.selected-warn { background: rgba(210,153,34,0.1); border-color: var(--warn); box-shadow: inset 0 0 12px rgba(210,153,34,0.2); }
+  .hmi-btn.selected-warn .hmi-text { color: var(--warn); }
+  .hmi-btn.selected-ko { background: rgba(248,81,73,0.1); border-color: var(--crit); box-shadow: inset 0 0 12px rgba(248,81,73,0.2); }
+  .hmi-btn.selected-ko .hmi-text { color: var(--crit); }
+  .hmi-btn.selected-amz { background: var(--amz-glow); border-color: var(--amz); box-shadow: inset 0 0 12px rgba(255,153,0,0.2); }
+  .hmi-btn.selected-amz .hmi-text { color: var(--amz); }
+  .hmi-btn.selected-dim { background: rgba(255,255,255,0.02); border-color: var(--text-disabled); }
+  .hmi-btn.selected-dim .hmi-text { color: var(--text-disabled); }
+
+  /* Ruedas y Master Switch */
+  .card-rueda { border-left: 4px solid var(--border); padding: 16px 24px; margin-bottom: 12px; }
+  .card-rueda.estado-ok { border-left-color: var(--ok); }
+  .card-rueda.estado-warn { border-left-color: var(--warn); }
+  .card-rueda.estado-ko { border-left-color: var(--crit); }
+  
+  .rueda-header-flex { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; cursor: pointer; }
+  .rueda-title-zone { display: flex; align-items: center; gap: 12px; flex: 1; }
+  .rueda-num { font-family: var(--font-mono); font-size: 32px; font-weight: 700; color: var(--amz); line-height: 1; min-width: 45px; }
+  .rueda-label { font-family: var(--font-heading); font-size: 18px; font-weight: 700; text-transform: uppercase; color: var(--text-main); }
+  .master-switch-zone { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-master { background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.2s; color: var(--text-muted); }
+  .btn-master.ok:hover { background: rgba(63,185,80,0.1); border-color: var(--ok); color: var(--ok); }
+  .btn-master.rep:hover { background: rgba(255,153,0,0.1); border-color: var(--amz); color: var(--amz); }
+  .rueda-chevron { color: var(--text-disabled); font-size: 14px; transition: transform 0.25s; margin-left: auto; padding-left: 12px;}
+  .card-rueda.collapsed .rueda-chevron { transform: rotate(-90deg); }
+  .card-rueda.collapsed .rueda-fields { display: none; }
+
+  /* Inputs, Labels & Tags */
+  .field-row { margin-bottom: 20px; }
+  .field-row.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .field-row.cols-2 { grid-template-columns: 1fr; } }
+  .field-label { font-family: var(--font-heading); font-size: 14px; font-weight: 700; color: var(--text-main); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;}
+  
+  .comp-tag { font-family: var(--font-mono); font-size: 10px; background: var(--card2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; color: var(--text-muted); }
+  .medida-tag { font-family: var(--font-mono); font-size: 11px; font-weight: 700; background: var(--medida-bg); border: 1px solid var(--medida); color: var(--medida); padding: 2px 8px; border-radius: 12px; white-space: nowrap; }
+  
+  .hint-text { font-family: var(--font-body); font-size: 12px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; }
+  .field-sep { height: 1px; background: var(--border); margin: 24px 0; }
+
+  input[type="text"], input[type="number"], select, textarea { width: 100%; background: var(--card2); border: 2px solid var(--border-field); border-radius: 8px; padding: 12px 16px; font-family: var(--font-mono); font-size: 14px; color: var(--text-main); transition: all 0.2s; outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--amz); box-shadow: 0 0 0 4px var(--amz-glow); }
+  input[type="file"] { padding: 8px; font-family: var(--font-body); font-size: 12px; color: var(--text-muted); background: transparent; border: 1px dashed var(--border-field); cursor: pointer; width: 100%; }
+  input[type="file"]::file-selector-button { background: var(--card2); border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px; color: var(--text-main); cursor: pointer; margin-right: 12px; font-family: var(--font-mono); }
+
+  .diam-wrap { position: relative; max-width: 200px; }
+  .diam-wrap input { font-size: 18px; font-weight: 700; color: var(--amz); padding-right: 40px; }
+  .diam-unit { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: 12px; color: var(--text-disabled); }
+
+  /* Map Overview */
+  .overview-grid { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; justify-content: flex-start; }
+  .ov-pill { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 8px; background: var(--card2); border: 2px solid var(--border); cursor: pointer; transition: all 0.2s; }
+  .ov-pill.ok { background: rgba(63,185,80,0.1); border-color: var(--ok); }
+  .ov-pill.warn { background: rgba(210,153,34,0.1); border-color: var(--warn); }
+  .ov-pill.ko { background: rgba(248,81,73,0.1); border-color: var(--crit); }
+  .ov-pill-num { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text-muted); }
+  .ov-pill.ok .ov-pill-num { color: var(--ok); }
+  .ov-pill.ko .ov-pill-num { color: var(--crit); }
+  .ov-pill.warn .ov-pill-num { color: var(--warn); }
+
+  /* Alertas & Submit */
+  .alert-box { background: rgba(210,153,34,0.1); border-left: 4px solid var(--warn); padding: 12px 16px; border-radius: 6px; font-family: var(--font-body); font-size: 13px; color: var(--warn); margin: 12px 0; }
+  .btn-submit { margin-top: 8px; width: 100%; padding: 18px; background: var(--ok); border: none; border-radius: 12px; color: #fff; font-family: var(--font-display); font-size: 20px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: all 0.2s; letter-spacing: 1px; }
+  .btn-submit:disabled { background: var(--card2); color: var(--text-disabled); cursor: not-allowed; border: 2px solid var(--border); }
+  .btn-submit:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(63,185,80,0.3); }
+</style>
+</head>
+<body>
+
+  <header class="topbar" style="--tb-color: var(--accent-repair)">
+    <div class="tb-zone">
+      <a href="index.html" class="t-display tb-logo">RMEHub</a>
+      <div class="tb-divider"></div>
+      <div class="tb-breadcrumb">Internal Repair · STX.M</div>
+    </div>
+    <div class="tb-zone">
+      <button onclick="clearDraft()" style="background:none; border:1px solid var(--border); color:var(--text-muted); padding:4px 10px; border-radius:6px; font-family:var(--font-mono); font-size:11px; cursor:pointer; margin-right:12px;">♻️ Limpiar Borrador</button>
+      <a href="index.html" class="btn-back">← <span class="back-text">Inicio</span></a>
+    </div>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label"><span id="progressPct">0</span>% COMPLETADO</div>
+  </div>
+
+  <div class="container">
+    <div class="alert-box" id="draftAlert" style="display:none; background:rgba(96,165,250,0.1); border-color:#60a5fa; color:#93c5fd;">
+      <strong>💾 Autoguardado Activo:</strong> Se ha recuperado tu progreso anterior.
+    </div>
+
+    <div class="section-header">
+      <span class="section-tag">D0</span>
+      <h2 class="section-title">Identificación y Estructura</h2>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="split-layout">
+      <div class="split-content card">
+        <div class="field-row cols-2">
+          <div>
+            <div class="field-label">Equipo (Divert) *</div>
+            <select id="equipoSelect" name="equipo" required onchange="cambiarEquipo()">
+              <option value="" disabled selected>⏳ Cargando equipos desde la nube...</option>
+            </select>
+            <div id="equipoLoadStatus" style="font-family:var(--font-mono); font-size:10px; margin-top:4px; color:var(--text-disabled);"></div>
+          </div>
+          <div>
+            <div class="field-label">Técnico Principal *</div>
+            <input type="text" id="tecnico1" name="tecnico1" placeholder="Login o Nombre" required autocomplete="off">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">¿Segundo técnico? *</div>
+          <div class="hmi-grid small">
+            <label class="hmi-btn" data-cls="amz"><input type="radio" name="segundo_tecnico_bool" value="SI" onchange="toggleSegundoTecnico(true)"><span class="hmi-icon">👥</span><span class="hmi-text">Sí</span></label>
+            <label class="hmi-btn" data-cls="ok"><input type="radio" name="segundo_tecnico_bool" value="NO" onchange="toggleSegundoTecnico(false)"><span class="hmi-icon">👤</span><span class="hmi-text">No</span></label>
+          </div>
+          <div id="segundoTecnicoInput" style="display:none; margin-top:12px;">
+            <input type="text" id="tecnico2" name="tecnico2" placeholder="Nombre del segundo técnico">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Tipo de intervención *</div>
+          <div class="hmi-grid">
+            <label class="hmi-btn" data-cls="amz"><input type="radio" name="tipo_intervencion" value="CORRECTIVA"><span class="hmi-icon">🔧</span><span class="hmi-text">Correctiva</span></label>
+            <label class="hmi-btn" data-cls="ok"><input type="radio" name="tipo_intervencion" value="PREVENTIVA"><span class="hmi-icon">📋</span><span class="hmi-text">Preventiva</span></label>
+            <label class="hmi-btn" data-cls="warn"><input type="radio" name="tipo_intervencion" value="INSPECCION"><span class="hmi-icon">🔍</span><span class="hmi-text">Inspección</span></label>
+            <label class="hmi-btn" data-cls="amz"><input type="radio" name="tipo_intervencion" value="MEJORA"><span class="hmi-icon">⚙️</span><span class="hmi-text">Mejora</span></label>
+          </div>
+        </div>
+        <div class="field-sep"></div>
+        <div class="field-row">
+          <div class="field-label">¿Estructura correcta, limpia y libre de fisuras? *</div>
+          <div class="hmi-grid small">
+            <label class="hmi-btn" data-cls="ok"><input type="radio" name="estructura_ok" value="Sí" onchange="toggleEstructuraKO(false)"><span class="hmi-icon">✅</span><span class="hmi-text">Sí</span></label>
+            <label class="hmi-btn" data-cls="ko"><input type="radio" name="estructura_ok" value="No" onchange="toggleEstructuraKO(true)"><span class="hmi-icon">❌</span><span class="hmi-text">No</span></label>
+          </div>
+          <div id="estructuraKOPanel" style="display:none; margin-top:16px; padding:16px; border:1px dashed var(--crit); background:rgba(248,81,73,0.05); border-radius:8px;">
+             <div class="field-label" style="color:var(--crit)">¿Tiene reparación? *</div>
+             <div class="hmi-grid small" style="margin-bottom:12px;">
+               <label class="hmi-btn" data-cls="warn"><input type="radio" name="estructura_reparable" value="Sí"><span class="hmi-icon">🛠️</span><span class="hmi-text">Sí</span></label>
+               <label class="hmi-btn" data-cls="ko"><input type="radio" name="estructura_reparable" value="No"><span class="hmi-icon">💀</span><span class="hmi-text">No</span></label>
+             </div>
+             <p class="hint-text">Avisa al SRMET comentándole el problema y pon este divert como NO REPARABLE. Sube una foto de la evidencia:</p>
+             <input type="file" id="fotoFisura" accept="image/*" capture="environment">
+          </div>
+        </div>
+      </div>
+      <div class="split-image-panel">
+        <div class="img-caption">Diagrama de Estructura D0</div>
+        <img src="img/stx_estructura.png" alt="Diagrama Estructura STX" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23142238\' stroke=\'%233b82f6\' stroke-width=\'2\' stroke-dasharray=\'8,8\'/%3E%3Ctext x=\'50%25\' y=\'45%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'16\' fill=\'%2360a5fa\'%3E%5B ESTRUCTURA %5D%3C/text%3E%3Ctext x=\'50%25\' y=\'60%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%237a90a8\'%3Eimg/stx_estructura.png%3C/text%3E%3C/svg%3E';">
+      </div>
+    </div>
+
+    <div id="dynamicContent" style="display:none; opacity:0; transition: opacity 0.4s;">
+      
+      <div class="section-header">
+        <span class="section-tag">D1</span>
+        <h2 class="section-title">Matriz de Ruedas</h2>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="split-layout">
+        <div class="split-content">
+          <div class="card" style="background:var(--bg); margin-bottom: 0;">
+            <div class="field-label" style="margin-bottom: 12px;">Plano de Ubicación</div>
+            <div class="overview-grid" id="overviewGrid"></div>
+          </div>
+          <div id="ruedasContainer"></div>
+        </div>
+        <div class="split-image-panel">
+          <div class="img-caption">Despiece de Rueda D1 (D1-1 a D1-6)</div>
+          <img src="img/stx_despiece_rueda.png" alt="Despiece Rueda D1" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'400\' viewBox=\'0 0 400 400\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23142238\' stroke=\'%233b82f6\' stroke-width=\'2\' stroke-dasharray=\'8,8\'/%3E%3Ctext x=\'50%25\' y=\'45%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'16\' fill=\'%2360a5fa\'%3E%5B DESPIECE D1 %5D%3C/text%3E%3Ctext x=\'50%25\' y=\'55%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%237a90a8\'%3Eimg/stx_despiece_rueda.png%3C/text%3E%3C/svg%3E';">
+          <div class="img-caption" style="margin-top:12px;">Ubicación General</div>
+          <img src="img/stx_ubicacion_ruedas.png" alt="Ubicación Ruedas" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\' viewBox=\'0 0 400 200\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23142238\' stroke=\'%233b82f6\' stroke-width=\'2\' stroke-dasharray=\'8,8\'/%3E%3Ctext x=\'50%25\' y=\'45%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'16\' fill=\'%2360a5fa\'%3E%5B UBICACIÓN %5D%3C/text%3E%3Ctext x=\'50%25\' y=\'65%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%237a90a8\'%3Eimg/stx_ubicacion_ruedas.png%3C/text%3E%3C/svg%3E';">
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-tag">D4–D7</span>
+        <h2 class="section-title">Sistema de Transmisión</h2>
+        <div class="section-divider"></div>
+      </div>
+      
+      <div class="split-layout">
+        <div class="split-content card">
+          <p class="hint-text">D4 = Rodillo largo Interroll · D5 = Rodillo esclavo · D7 = Cinturón Poly-V</p>
+          <div class="field-row">
+            <div class="field-label"><span class="comp-tag">D4</span> Rodillo de accionamiento Interroll EC5000 *</div>
+            <div class="hmi-grid" id="grid_d4_rodillo"></div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Fijación rodillo D4 <span class="medida-tag">Torque: 20 Nm</span> *</div>
+            <div class="hmi-grid">
+              <label class="hmi-btn" data-cls="ok"><input type="radio" name="d4_par" value="Sí - 20Nm"><span class="hmi-icon">✅</span><span class="hmi-text">Sí (20 Nm)</span></label>
+              <label class="hmi-btn" data-cls="ko"><input type="radio" name="d4_par" value="No - a mano"><span class="hmi-icon">❌</span><span class="hmi-text">No (A mano)</span></label>
+              <label class="hmi-btn" data-cls="dim"><input type="radio" name="d4_par" value="N/A"><span class="hmi-icon">—</span><span class="hmi-text">No aplica</span></label>
+            </div>
+          </div>
+          <div class="field-sep"></div>
+          <div class="field-row cols-2">
+            <div>
+              <div class="field-label"><span class="comp-tag">D5</span> Rodillo esclavo *</div>
+              <div class="hmi-grid small" id="grid_d5_rodillo"></div>
+            </div>
+            <div>
+              <div class="field-label"><span class="comp-tag">D7</span> Correa Poly-V <span class="medida-tag">2PJ 314 mm</span> *</div>
+              <div class="hmi-grid small" id="grid_d7_correa"></div>
+            </div>
+          </div>
+        </div>
+        <div class="split-image-panel">
+          <div class="img-caption">Transmisión (D4 a D7)</div>
+          <img src="img/stx_transmision.png" alt="Transmisión STX" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23142238\' stroke=\'%233b82f6\' stroke-width=\'2\' stroke-dasharray=\'8,8\'/%3E%3Ctext x=\'50%25\' y=\'45%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'16\' fill=\'%2360a5fa\'%3E%5B TRANSMISIÓN %5D%3C/text%3E%3Ctext x=\'50%25\' y=\'60%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%237a90a8\'%3Eimg/stx_transmision.png%3C/text%3E%3C/svg%3E';">
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-tag">D8–D12</span>
+        <h2 class="section-title">Cilindro Neumático y Conexiones</h2>
+        <div class="section-divider"></div>
+      </div>
+      
+      <div class="split-layout">
+        <div class="split-content card">
+          <div class="field-row cols-2">
+            <div>
+              <div class="field-label"><span class="comp-tag">D8</span> Pistón neumático *</div>
+              <div class="hmi-grid small" id="grid_d8_piston"></div>
+            </div>
+            <div>
+              <div class="field-label">Ojo de vástago <span class="medida-tag">SGS-M8</span> *</div>
+              <div class="hmi-grid small" id="grid_d8_ojo"></div>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">D8 - Pistón colocado en posición baja *</div>
+            <div class="hmi-grid">
+              <label class="hmi-btn" data-cls="ok"><input type="radio" name="d8_posicion" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">OK Posición</span></label>
+              <label class="hmi-btn" data-cls="amz"><input type="radio" name="d8_posicion" value="Modificado"><span class="hmi-icon">🔄</span><span class="hmi-text">Modificado</span></label>
+              <label class="hmi-btn" data-cls="dim"><input type="radio" name="d8_posicion" value="No insp"><span class="hmi-icon">—</span><span class="hmi-text">No Insp</span></label>
+            </div>
+          </div>
+          <div class="field-row cols-2">
+            <div>
+              <div class="field-label"><span class="comp-tag">D11</span> Tubería <span class="medida-tag">Ø 6x1 mm</span> *</div>
+              <div class="hmi-grid small" id="grid_d11_tubo"></div>
+            </div>
+            <div>
+              <div class="field-label"><span class="comp-tag">D12</span> Racores rápidos <span class="medida-tag">Q5S-6</span> *</div>
+              <div class="hmi-grid small" id="grid_d12_racores"></div>
+            </div>
+          </div>
+        </div>
+        <div class="split-image-panel">
+          <div class="img-caption">Circuito Neumático (D8, D11, D12)</div>
+          <img src="img/stx_neumatica.png" alt="Neumática STX" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23142238\' stroke=\'%233b82f6\' stroke-width=\'2\' stroke-dasharray=\'8,8\'/%3E%3Ctext x=\'50%25\' y=\'45%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'16\' fill=\'%2360a5fa\'%3E%5B NEUMÁTICA %5D%3C/text%3E%3Ctext x=\'50%25\' y=\'60%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%237a90a8\'%3Eimg/stx_neumatica.png%3C/text%3E%3C/svg%3E';">
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-tag">⚠️</span>
+        <h2 class="section-title">Reglajes Críticos de Montaje</h2>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="split-layout">
+        <div class="split-content card" style="border-color: rgba(210,153,34,0.3);">
+          <p class="hint-text" style="color:var(--warn); margin-bottom:16px;">Estos reglajes son de SEGURIDAD Y FUNCIONAMIENTO. Sin ellos correctos la máquina NO puede volver al stock.</p>
+          <div class="field-row">
+            <div class="field-label">Cubierta protección <span class="medida-tag">Huelgo: 2.0 mm</span> *</div>
+            <div class="hmi-grid">
+              <label class="hmi-btn" data-cls="ok"><input type="radio" name="reg_cubierta" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">Verificado</span></label>
+              <label class="hmi-btn" data-cls="ko"><input type="radio" name="reg_cubierta" value="KO"><span class="hmi-icon">❌</span><span class="hmi-text">Riesgo</span></label>
+              <label class="hmi-btn" data-cls="dim"><input type="radio" name="reg_cubierta" value="No insp"><span class="hmi-icon">—</span><span class="hmi-text">N/A</span></label>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Pistón neumático <span class="medida-tag">Cotas X1/X2/X3</span> *</div>
+            <div class="hmi-grid">
+              <label class="hmi-btn" data-cls="ok"><input type="radio" name="reg_piston" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">Verificado</span></label>
+              <label class="hmi-btn" data-cls="amz"><input type="radio" name="reg_piston" value="Reajustado"><span class="hmi-icon">🔄</span><span class="hmi-text">Reajustado</span></label>
+              <label class="hmi-btn" data-cls="dim"><input type="radio" name="reg_piston" value="No insp"><span class="hmi-icon">—</span><span class="hmi-text">N/A</span></label>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Tuercas de fijación (Brazos/chasis) *</div>
+            <div class="hmi-grid">
+              <label class="hmi-btn" data-cls="ok"><input type="radio" name="reg_tuercas" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">Verificadas</span></label>
+              <label class="hmi-btn" data-cls="amz"><input type="radio" name="reg_tuercas" value="Sustituido"><span class="hmi-icon">🔄</span><span class="hmi-text">Sustituidas</span></label>
+              <label class="hmi-btn" data-cls="dim"><input type="radio" name="reg_tuercas" value="No insp"><span class="hmi-icon">—</span><span class="hmi-text">N/A</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="split-image-panel">
+          <div class="img-caption">Cotas Reglaje X1/X2/X3</div>
+          <img src="img/stx_reglajes.png" alt="Cotas Reglaje STX" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'100%25\' height=\'100%25\' fill=\'%23142238\' stroke=\'%233b82f6\' stroke-width=\'2\' stroke-dasharray=\'8,8\'/%3E%3Ctext x=\'50%25\' y=\'45%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'16\' fill=\'%2360a5fa\'%3E%5B COTAS X1/X2/X3 %5D%3C/text%3E%3Ctext x=\'50%25\' y=\'60%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%237a90a8\'%3Eimg/stx_reglajes.png%3C/text%3E%3C/svg%3E';">
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-tag">TEST</span>
+        <h2 class="section-title">Validación en Banco y Cierre</h2>
+        <div class="section-divider"></div>
+      </div>
+      
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="field-row">
+          <div class="field-label">¿Unidad en banco, fluido y presión OK? *</div>
+          <div class="hmi-grid">
+            <label class="hmi-btn" data-cls="ok"><input type="radio" name="prueba_banco" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">Apto</span></label>
+            <label class="hmi-btn" data-cls="ko"><input type="radio" name="prueba_banco" value="NO OK"><span class="hmi-icon">❌</span><span class="hmi-text">Fallo</span></label>
+          </div>
+        </div>
+        <div class="field-row cols-2">
+          <div><div class="field-label">Ruedas giran libremente *</div><div class="hmi-grid small"><label class="hmi-btn" data-cls="ok"><input type="radio" name="prueba_giran" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">Sí</span></label><label class="hmi-btn" data-cls="ko"><input type="radio" name="prueba_giran" value="KO"><span class="hmi-icon">❌</span><span class="hmi-text">No</span></label></div></div>
+          <div><div class="field-label">Cables asegurados *</div><div class="hmi-grid small"><label class="hmi-btn" data-cls="ok"><input type="radio" name="prueba_cables" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">Sí</span></label><label class="hmi-btn" data-cls="ko"><input type="radio" name="prueba_cables" value="KO"><span class="hmi-icon">❌</span><span class="hmi-text">No</span></label></div></div>
+        </div>
+        <div class="field-row cols-2">
+          <div><div class="field-label">Cubierta en posición *</div><div class="hmi-grid small"><label class="hmi-btn" data-cls="ok"><input type="radio" name="prueba_cubierta" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">Sí</span></label><label class="hmi-btn" data-cls="ko"><input type="radio" name="prueba_cubierta" value="KO"><span class="hmi-icon">❌</span><span class="hmi-text">No</span></label></div></div>
+          <div><div class="field-label">Tornillos y fijador OK *</div><div class="hmi-grid small"><label class="hmi-btn" data-cls="ok"><input type="radio" name="prueba_tornillos" value="OK"><span class="hmi-icon">✅</span><span class="hmi-text">Sí</span></label><label class="hmi-btn" data-cls="ko"><input type="radio" name="prueba_tornillos" value="KO"><span class="hmi-icon">❌</span><span class="hmi-text">No</span></label></div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Unidad Limpia *</div>
+          <div class="hmi-grid small">
+              <label class="hmi-btn" data-cls="ok"><input type="radio" name="prueba_limpia" value="OK"><span class="hmi-icon">✨</span><span class="hmi-text">Sí</span></label>
+              <label class="hmi-btn" data-cls="ko"><input type="radio" name="prueba_limpia" value="KO"><span class="hmi-icon">❌</span><span class="hmi-text">No</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background:rgba(255,153,0,0.03);">
+        <div class="field-row">
+          <div class="field-label">Observaciones técnicas</div>
+          <textarea id="observaciones" name="observaciones" placeholder="Escriba cualquier observación que se considere..." rows="3"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Confirmación del técnico *</div>
+          <p class="hint-text">Escriba "INSPECCIÓN REALIZADA".</p>
+          <input type="text" id="firma" name="firma" placeholder="INSPECCIÓN REALIZADA" style="text-align:center; font-size:16px; font-weight:700;">
+        </div>
+        <div class="field-row">
+          <div class="field-label">Foto final del STX reparado *</div>
+          <input type="file" id="fotoFinal" accept="image/*" capture="environment" required>
+        </div>
+        
+        <div id="missingReqs" style="font-family: var(--font-mono); font-size: 13px; font-weight: bold; text-align: center; margin-bottom: 12px; margin-top: 24px;"></div>
+        
+        <button class="btn-submit" id="btnSubmit" disabled>Confirmar e indexar en sistema</button>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+// URL para ENVÍO de datos (doPost) — ya configurada
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg8dWUtSFrIzUjVKEUDuPnvGyiadJ0rUJWgT9jUIBgjyCpXjFvX-UULxr8mtmJXLskAw/exec'; 
+
+// URL para LECTURA del catálogo (doGet — Maestro_Equipos)
+// ⚠️ Sustituir por la URL del Apps Script cuando hagas la implementación doGet
+// Puede ser la MISMA URL que APPS_SCRIPT_URL si usas el mismo script con doGet + doPost
+const CATALOGO_URL = 'https://script.google.com/macros/s/AKfycbxg8dWUtSFrIzUjVKEUDuPnvGyiadJ0rUJWgT9jUIBgjyCpXjFvX-UULxr8mtmJXLskAw/exec';
+
+// Equipos de fallback — se usan si la red falla o durante desarrollo offline
+const EQUIPOS_FALLBACK = [
+  { id: 'STX-08', linea: 'Línea B', modelo: 'Corto',  ruedas: 8  },
+  { id: 'STX-09', linea: 'Línea B', modelo: 'Corto',  ruedas: 8  },
+  { id: 'STX-10', linea: 'Línea C', modelo: 'Corto',  ruedas: 8  },
+  { id: 'STX-01', linea: 'Línea A', modelo: 'Largo',  ruedas: 12 },
+  { id: 'STX-02', linea: 'Línea A', modelo: 'Largo',  ruedas: 12 },
+  { id: 'STX-03', linea: 'Línea A', modelo: 'Largo',  ruedas: 12 },
+  { id: 'STX-04', linea: 'Línea A', modelo: 'Largo',  ruedas: 12 },
+  { id: 'STX-05', linea: 'Línea B', modelo: 'Largo',  ruedas: 12 },
+  { id: 'STX-06', linea: 'Línea B', modelo: 'Largo',  ruedas: 12 },
+  { id: 'STX-07', linea: 'Línea C', modelo: 'Largo',  ruedas: 12 },
+];
+
+// ── FASE 1: CARGA DINÁMICA DEL CATÁLOGO DESDE GOOGLE SHEETS ──
+async function cargarEquiposDesdeNube() {
+  const select = document.getElementById('equipoSelect');
+  const statusEl = document.getElementById('equipoLoadStatus');
+
+  statusEl.textContent = '📡 Conectando con Google Sheets...';
+
+  try {
+    const res = await fetch(CATALOGO_URL, { method: 'GET', mode: 'cors' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const equipos = await res.json();
+
+    poblarSelect(select, equipos);
+    statusEl.textContent = '✅ ' + equipos.length + ' equipos cargados desde la nube';
+    statusEl.style.color = 'var(--ok)';
+    setTimeout(() => statusEl.textContent = '', 4000);
+
+  } catch (err) {
+    // Sin conexión o CATALOGO_URL no configurada — usar fallback local
+    console.warn('Catálogo online no disponible, usando fallback local:', err.message);
+    poblarSelect(select, EQUIPOS_FALLBACK);
+    statusEl.innerHTML = '⚠️ Sin conexión — lista local. <a href="#" onclick="cargarEquiposDesdeNube();return false;" style="color:var(--amz);">Reintentar</a>';
+    statusEl.style.color = 'var(--warn)';
+  }
+
+  // Restaurar borrador si existía — ahora que el select ya tiene opciones
+  loadFromLocal();
+}
+
+function poblarSelect(select, equipos) {
+  // Agrupar por número de ruedas
+  const grupos = {};
+  equipos.forEach(eq => {
+    const key = eq.ruedas + ' ruedas';
+    if (!grupos[key]) grupos[key] = [];
+    grupos[key].push(eq);
+  });
+
+  let html = '<option value="" disabled selected>-- Seleccionar equipo --</option>';
+  Object.entries(grupos)
+    .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
+    .forEach(([label, lista]) => {
+      const modeloLabel = lista[0]?.modelo ? lista[0].modelo + ' · ' + label : label;
+      html += '<optgroup label="Modelo ' + modeloLabel + '">';
+      lista.forEach(eq => {
+        html += '<option value="' + eq.id + '" data-ruedas="' + eq.ruedas + '">' + eq.id + ' (' + eq.linea + ')</option>';
+      });
+      html += '</optgroup>';
+    });
+
+  select.innerHTML = html;
+}
+
+let startTime = null;
+let currentRuedasCount = 0;
+
+const HMI_STANDARD = [
+  { v: 'OK', icon: '✅', shortLabel: 'OK', cls: 'ok' },
+  { v: 'SUSTITUIDO', icon: '🔄', shortLabel: 'Sustituido', cls: 'amz' },
+  { v: 'No inspeccionado', icon: '—', shortLabel: 'N/A', cls: 'dim' }
+];
+
+const HMI_VISUAL = [
+  { v: 'OK', icon: '✅', shortLabel: 'OK', cls: 'ok' },
+  { v: 'DESGASTE', icon: '⚠️', shortLabel: 'Desgaste', cls: 'warn' },
+  { v: 'KO', icon: '❌', shortLabel: 'Grieta', cls: 'ko' },
+  { v: 'No inspeccionado', icon: '—', shortLabel: 'N/A', cls: 'dim' }
+];
+
+const HMI_ALOJAMIENTO = [
+  { v: 'OK', icon: '✅', shortLabel: 'OK', cls: 'ok' },
+  { v: 'NO APLICADO', icon: '⚠️', shortLabel: 'Riesgo', cls: 'ko' },
+  { v: 'SUSTITUIDO', icon: '🔄', shortLabel: 'Sustituido', cls: 'amz' },
+  { v: 'No inspeccionado', icon: '—', shortLabel: 'N/A', cls: 'dim' }
+];
+
+function toggleSegundoTecnico(show) {
+  document.getElementById('segundoTecnicoInput').style.display = show ? 'block' : 'none';
+  if(!show) document.getElementById('tecnico2').value = '';
+  updateProgress();
+}
+
+function toggleEstructuraKO(show) {
+  document.getElementById('estructuraKOPanel').style.display = show ? 'block' : 'none';
+  updateProgress();
+}
+
+function injectHMI(id, name, options) {
+  const el = document.getElementById(id);
+  if(el) el.innerHTML = options.map(o => 
+    `<label class="hmi-btn" data-cls="${o.cls}">
+      <input type="radio" name="${name}" value="${o.v}">
+      <span class="hmi-icon">${o.icon}</span><span class="hmi-text">${o.shortLabel}</span>
+    </label>`
+  ).join('');
+}
+
+injectHMI('grid_d4_rodillo', 'd4_rodillo', HMI_STANDARD);
+injectHMI('grid_d5_rodillo', 'd5_rodillo', HMI_STANDARD);
+injectHMI('grid_d7_correa', 'd7_correa', HMI_STANDARD);
+injectHMI('grid_d8_piston', 'd8_piston', HMI_STANDARD);
+injectHMI('grid_d8_ojo', 'd8_ojo', HMI_STANDARD);
+injectHMI('grid_d11_tubo', 'd11_tubo', HMI_STANDARD);
+injectHMI('grid_d12_racores', 'd12_racores', HMI_STANDARD);
+
+function buildHMIGridStr(name, options, isSmall=false) {
+  return `<div class="hmi-grid ${isSmall ? 'small' : ''}">${options.map(o =>
+    `<label class="hmi-btn" data-cls="${o.cls}">
+      <input type="radio" name="${name}" value="${o.v}">
+      <span class="hmi-icon">${o.icon}</span><span class="hmi-text">${o.shortLabel}</span>
+    </label>`
+  ).join('')}</div>`;
+}
+
+function cambiarEquipo() {
+  const sel = document.getElementById('equipoSelect');
+  const count = parseInt(sel.options[sel.selectedIndex].getAttribute('data-ruedas'));
+  
+  if (count && count !== currentRuedasCount) {
+    currentRuedasCount = count;
+    renderRuedas(count);
+    document.getElementById('dynamicContent').style.display = 'block';
+    setTimeout(() => document.getElementById('dynamicContent').style.opacity = '1', 50);
+    if (!startTime) startTime = new Date().getTime(); 
+  }
+  saveToLocal(); updateProgress();
+}
+
+function renderRuedas(count) {
+  const grid = document.getElementById('overviewGrid');
+  const container = document.getElementById('ruedasContainer');
+  grid.innerHTML = ''; container.innerHTML = '';
+
+  for (let i = 1; i <= count; i++) {
+    grid.innerHTML += `<div class="ov-pill" id="ov-${i}" onclick="toggleRueda(${i})"><span class="ov-pill-num">${i}</span></div>`;
+
+    container.innerHTML += `
+      <div class="card card-rueda collapsed" id="card-rueda-${i}">
+        <div class="rueda-header-flex">
+          <div class="rueda-title-zone" onclick="toggleRueda(${i})">
+            <span class="rueda-num">${i < 10 ? '0'+i : i}</span>
+            <span class="rueda-label">Rueda ${i}</span>
+          </div>
+          <div class="master-switch-zone">
+            <button class="btn-master ok" type="button" onclick="masterSwitch(${i}, 'OK')">✅ Módulo OK</button>
+            <button class="btn-master rep" type="button" onclick="masterSwitch(${i}, 'SUSTITUIDO')">🔄 Módulo Nuevo</button>
+          </div>
+          <span class="rueda-chevron" onclick="toggleRueda(${i})">▼</span>
+        </div>
+        
+        <div class="rueda-fields">
+          <div class="field-row cols-2">
+            <div>
+              <div class="field-label"><span class="comp-tag">D1-1</span> Visual</div>
+              ${buildHMIGridStr(`r${i}_visual`, HMI_VISUAL)}
+            </div>
+            <div>
+              <div class="field-label"><span class="comp-tag">D1-1</span> Diámetro <span class="medida-tag">Nominal: Ø 57.0 mm</span></div>
+              <div class="diam-wrap"><input type="number" id="r${i}_diam" name="r${i}_diam" step="0.1" placeholder="57.0"><span class="diam-unit">mm</span></div>
+              <p class="hint-text" style="margin-top:6px;">Límite descarte: <strong style="color:var(--warn)">≤ 54.0 mm</strong> | Retirada: <strong style="color:var(--crit)">≤ 53.0 mm</strong></p>
+            </div>
+          </div>
+          
+          <div class="field-row cols-2">
+            <div><div class="field-label"><span class="comp-tag">D1-2</span> Tornillos (x2) <span class="medida-tag">Loctite 243</span></div>${buildHMIGridStr(`r${i}_pernos`, HMI_STANDARD, true)}</div>
+            <div><div class="field-label"><span class="comp-tag">D1-3</span> Alojamiento</div>${buildHMIGridStr(`r${i}_aloj`, HMI_ALOJAMIENTO, true)}</div>
+          </div>
+          <div class="field-row cols-2">
+            <div><div class="field-label"><span class="comp-tag">D1-4</span> Horquilla</div>${buildHMIGridStr(`r${i}_horq`, HMI_STANDARD, true)}</div>
+            <div><div class="field-label"><span class="comp-tag">D1-5</span> Guía rotación</div>${buildHMIGridStr(`r${i}_eje`, HMI_STANDARD, true)}</div>
+          </div>
+          <div class="field-row cols-2">
+            <div><div class="field-label"><span class="comp-tag">D1-6</span> Espiga <span class="medida-tag">Loctite 243</span></div>${buildHMIGridStr(`r${i}_espiga`, HMI_STANDARD, true)}</div>
+            <div><div class="field-label"><span class="comp-tag">D6</span> Cinturón <span class="medida-tag">Ø 5 mm | L: 505 mm</span></div>${buildHMIGridStr(`r${i}_correa`, HMI_STANDARD, true)}</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Observaciones</div>
+            <textarea name="r${i}_obs" placeholder="Anomalías, notas..."></textarea>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function toggleRueda(n) { document.getElementById(`card-rueda-${n}`).classList.toggle('collapsed'); }
+
+function masterSwitch(r, state) {
+  const card = document.getElementById(`card-rueda-${r}`);
+
+  // Para cada hmi-grid dentro de la rueda, seleccionar el botón correcto según estado
+  card.querySelectorAll('.hmi-grid').forEach(grid => {
+    // Buscar el radio target según prioridad:
+    // estado OK    → preferir value "OK"
+    // estado SUST  → preferir value "SUSTITUIDO", si no existe usar el segundo botón
+    let target = null;
+
+    if (state === 'OK') {
+      target = grid.querySelector('input[value="OK"]');
+    } else {
+      // SUSTITUIDO: buscar en orden de prioridad
+      target = grid.querySelector('input[value="SUSTITUIDO"]')
+            || grid.querySelector('input[value="Reajustado"]')
+            || grid.querySelector('input[value="Modificado"]')
+            || grid.querySelector('input[value="Sustituido"]');
+      // Si el grid no tiene ningún valor "sustituido" (ej: visual tiene OK/DESGASTE/KO/NI)
+      // para "módulo nuevo" marcamos OK en visual (rueda nueva = visual OK)
+      if (!target && state === 'SUSTITUIDO') {
+        target = grid.querySelector('input[value="OK"]');
+      }
+    }
+
+    if (!target) return;
+
+    // Desmarcar todos en el grupo y limpiar clases CSS
+    grid.querySelectorAll('.hmi-btn').forEach(btn => {
+      btn.className = 'hmi-btn';
+      btn.querySelector('input').checked = false;
+    });
+
+    // Marcar el target y aplicar clase visual
+    target.checked = true;
+    const label = target.closest('.hmi-btn');
+    if (label) label.classList.add(`selected-${label.dataset.cls}`);
+  });
+
+  // Diámetro: rueda nueva = 57.0mm nominal, rueda OK existente = 56.5mm
+  const diam = document.getElementById(`r${r}_diam`);
+  if (diam) {
+    diam.value = state === 'OK' ? 56.5 : 57.0;
+    diam.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  updateMap();
+  saveToLocal();
+  updateProgress();
+  card.classList.add('collapsed');
+}
+
+// ── UI EVENTS ──
+document.addEventListener('change', e => {
+  if (e.target.type === 'radio' && e.target.closest('.hmi-btn')) {
+    const group = e.target.closest('.hmi-grid');
+
+    // Limpiar selección visual de todo el grupo
+    group.querySelectorAll('.hmi-btn').forEach(btn => btn.className = 'hmi-btn');
+
+    // Aplicar clase al botón marcado
+    const label = e.target.closest('.hmi-btn');
+    if (label) label.classList.add(`selected-${label.dataset.cls}`);
+
+    updateMap(); saveToLocal(); updateProgress();
+  }
+});
+
+function updateMap() {
+  if (!currentRuedasCount) return;
+  for (let i = 1; i <= currentRuedasCount; i++) {
+    const card = document.getElementById(`card-rueda-${i}`);
+    const pill = document.getElementById(`ov-${i}`);
+    if(!card || !pill) continue;
+    
+    const checked = card.querySelectorAll('input[type="radio"]:checked');
+    pill.className = 'ov-pill';
+    card.className = card.className.replace(/estado-\w+/g, '').trim();
+
+    let hasKO = false, hasRep = false, countOK = 0;
+    checked.forEach(c => {
+      if (['KO','DESGASTE','NO APLICADO'].includes(c.value)) hasKO = true;
+      if (c.value === 'SUSTITUIDO') hasRep = true;
+      if (c.value === 'OK') countOK++;
+    });
+
+    const diamVal = parseFloat(document.getElementById(`r${i}_diam`)?.value);
+    if(diamVal <= 53.0) hasKO = true;
+
+    if (hasKO) { pill.classList.add('ko'); card.classList.add('estado-ko'); } 
+    else if (hasRep) { pill.classList.add('warn'); card.classList.add('estado-warn'); } 
+    else if (countOK > 0) { pill.classList.add('ok'); card.classList.add('estado-ok'); }
+  }
+}
+
+function saveToLocal() {
+  const data = {
+    startTime, equipo: document.getElementById('equipoSelect').value,
+    tecnico: document.getElementById('tecnico1').value,
+    observaciones: document.getElementById('observaciones').value,
+    firma: document.getElementById('firma').value,
+    radios: {}, diams: {}
+  };
+  document.querySelectorAll('input[type="radio"]:checked').forEach(r => data.radios[r.name] = r.value);
+  document.querySelectorAll('input[type="number"]').forEach(i => data.diams[i.name] = i.value);
+  localStorage.setItem('stx_draft_final', JSON.stringify(data));
+}
+
+function loadFromLocal() {
+  const draft = localStorage.getItem('stx_draft_final');
+  if (!draft) return;
+  const data = JSON.parse(draft);
+  if (data.equipo) { document.getElementById('equipoSelect').value = data.equipo; cambiarEquipo(); document.getElementById('draftAlert').style.display = 'block'; }
+  if (data.startTime) startTime = data.startTime;
+  if (data.tecnico) document.getElementById('tecnico1').value = data.tecnico;
+  if (data.observaciones) document.getElementById('observaciones').value = data.observaciones;
+  if (data.firma) {
+    const f = document.getElementById('firma');
+    f.value = data.firma;
+    // Forzamos el chequeo visual inicial de la firma
+    const f_norm = data.firma.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    f.style.borderColor = f_norm === 'INSPECCION REALIZADA' ? 'var(--ok)' : 'var(--border-field)';
+  }
+  setTimeout(() => {
+    Object.keys(data.radios).forEach(name => {
+      const el = document.querySelector(`input[name="${name}"][value="${data.radios[name]}"]`);
+      if (el) { el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
+    Object.keys(data.diams).forEach(name => {
+      const el = document.getElementById(name);
+      if (el) el.value = data.diams[name];
+    });
+    updateMap(); updateProgress();
+  }, 100);
+}
+
+function clearDraft() { localStorage.removeItem('stx_draft_final'); location.reload(); }
+
+// ── updateProgress: cuenta grids visibles con radio marcado ──
+function updateProgress() {
+  if (!currentRuedasCount) return;
+
+  // Recoger todos los hmi-grid del DOM en este momento,
+  // excluyendo los que están dentro de paneles ocultos
+  const panelKO = document.getElementById('estructuraKOPanel');
+  const allGrids = Array.from(document.querySelectorAll('.hmi-grid'));
+
+  const grids = allGrids.filter(g => {
+    // Excluir si pertenece al panel KO cuando éste está oculto
+    if (panelKO && panelKO.style.display === 'none' && panelKO.contains(g)) return false;
+    // Excluir si algún ancestro directo tiene display:none
+    let el = g.parentElement;
+    while (el && el !== document.body) {
+      if (window.getComputedStyle(el).display === 'none') return false;
+      el = el.parentElement;
+    }
+    return true;
+  });
+
+  let answered = 0;
+  grids.forEach(g => {
+    if (g.querySelector('input[type="radio"]:checked')) answered++;
+  });
+
+  const total = grids.length;
+  const pct = total > 0 ? Math.min(100, Math.round((answered / total) * 100)) : 0;
+
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct;
+
+  const t1    = document.getElementById('tecnico1').value.trim();
+  const file  = document.getElementById('fotoFinal').files.length > 0;
+  const f_raw = document.getElementById('firma').value.trim().toUpperCase()
+                  .normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const firmaOK = f_raw === 'INSPECCION REALIZADA';
+
+  let missing = [];
+  if (pct < 100) missing.push('Opciones (' + answered + '/' + total + ')');
+  if (!t1)       missing.push('Técnico');
+  if (!firmaOK)  missing.push('Firma');
+  if (!file)     missing.push('Foto Final');
+
+  const missingEl = document.getElementById('missingReqs');
+  if (missing.length === 0) {
+    missingEl.innerHTML = '✅ TODO LISTO PARA ENVIAR';
+    missingEl.style.color = 'var(--ok)';
+    document.getElementById('btnSubmit').disabled = false;
+  } else {
+    missingEl.innerHTML = '⚠️ FALTA: <span style="color:var(--text-main)">' + missing.join(' | ') + '</span>';
+    missingEl.style.color = 'var(--warn)';
+    document.getElementById('btnSubmit').disabled = true;
+  }
+}
+
+document.getElementById('fotoFinal').addEventListener('change', updateProgress);
+
+document.addEventListener('input', e => {
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) {
+    if(e.target.id === 'firma') {
+      const val = e.target.value.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      e.target.style.borderColor = val === 'INSPECCION REALIZADA' ? 'var(--ok)' : 'var(--border-field)';
+      e.target.style.color = val === 'INSPECCION REALIZADA' ? 'var(--ok)' : 'var(--text-main)';
+    }
+    saveToLocal(); updateProgress();
+  }
+});
+
+// ── MAPA DE NOMBRES LEGIBLES PARA EL RESUMEN ──
+const NOMBRE_PIEZA = {
+  // Componentes por rueda (se expanden dinámicamente para r1..r12)
+  visual:   'Visual D1-1',
+  diam:     'Diámetro D1-1',
+  pernos:   'Tornillos D1-2',
+  aloj:     'Alojamiento D1-3',
+  horq:     'Horquilla D1-4',
+  eje:      'Guía rotación D1-5',
+  espiga:   'Espiga D1-6',
+  correa:   'Cinturón D6',
+  // Transmisión
+  d4_rodillo:  'Rodillo Interroll D4',
+  d4_par:      'Par D4 (20Nm)',
+  d5_rodillo:  'Rodillo esclavo D5',
+  d7_correa:   'Correa Poly-V D7',
+  // Neumática
+  d8_piston:   'Pistón neumático D8',
+  d8_ojo:      'Ojo vástago SGS-M8',
+  d8_posicion: 'Posición pistón D8',
+  d11_tubo:    'Tubería 6×1mm D11',
+  d12_racores: 'Racores Q5S-6 D12',
+  // Reglajes
+  reg_cubierta: 'Cubierta protección',
+  reg_piston:   'Reglaje pistón X1/X2/X3',
+  reg_tuercas:  'Tuercas fijación',
+  // Pruebas
+  prueba_banco:    'Banco pruebas',
+  prueba_giran:    'Ruedas giran libre',
+  prueba_cables:   'Cables asegurados',
+  prueba_cubierta: 'Cubierta posición',
+  prueba_tornillos:'Tornillos par+fijador',
+  prueba_limpia:   'Unidad limpia',
+};
+
+// Valores que se clasifican como OK, SUSTITUIDO o KO/ALERTA
+const VALORES_OK   = ['OK', 'Sí', 'Sí - 20Nm'];
+const VALORES_SUST = ['SUSTITUIDO', 'Reajustado', 'Sustituido', 'Modificado'];
+const VALORES_KO   = ['KO', 'DESGASTE', 'NO OK', 'NO APLICADO', 'No - a mano'];
+
+function clasificarValor(val) {
+  if (!val || val === 'No inspeccionado' || val === 'N/A' || val === 'No insp') return null;
+  const v = val.toUpperCase();
+  if (VALORES_OK.some(x => v.includes(x.toUpperCase())))   return 'ok';
+  if (VALORES_SUST.some(x => v.includes(x.toUpperCase()))) return 'sust';
+  if (VALORES_KO.some(x => v.includes(x.toUpperCase())))   return 'ko';
+  return null;
+}
+
+function nombreLegible(radioName, val) {
+  // Rueda: r1_visual, r3_pernos, etc.
+  const ruedaMatch = radioName.match(/^r(\d+)_(.+)$/);
+  if (ruedaMatch) {
+    const num = ruedaMatch[1];
+    const campo = ruedaMatch[2];
+    const etiqueta = NOMBRE_PIEZA[campo] || campo;
+    // Para diámetro añadir el valor medido
+    if (campo === 'diam') {
+      const diamEl = document.getElementById(`r${num}_diam`);
+      const mm = diamEl ? diamEl.value : '';
+      return `R${num} · ${etiqueta}${mm ? ' (' + mm + 'mm)' : ''}`;
+    }
+    return `R${num} · ${etiqueta}`;
+  }
+  return NOMBRE_PIEZA[radioName] || radioName;
+}
+
+function generarResumenPiezas() {
+  const listas = { ok: [], sust: [], ko: [] };
+
+  document.querySelectorAll('input[type="radio"]:checked').forEach(r => {
+    const cat = clasificarValor(r.value);
+    if (!cat) return;
+    listas[cat].push(nombreLegible(r.name, r.value));
+  });
+
+  // Diámetros sin radio marcado (campo numérico libre) — ya cubiertos por el radio diam
+  // pero añadimos los que estén fuera de límite según valor
+  for (let i = 1; i <= currentRuedasCount; i++) {
+    const el = document.getElementById(`r${i}_diam`);
+    if (!el || !el.value) continue;
+    const v = parseFloat(el.value);
+    // Solo añadir alerta de diámetro si no hay radio diam marcado
+    const radioMarcado = document.querySelector(`input[name="r${i}_diam"]:checked`);
+    if (!radioMarcado) {
+      if (v <= 53) listas.ko.push(`R${i} · Diámetro D1-1 (${v}mm ≤53 RETIRAR)`);
+      else if (v <= 54) listas.sust.push(`R${i} · Diámetro D1-1 (${v}mm última op.)`);
+      else listas.ok.push(`R${i} · Diámetro D1-1 (${v}mm)`);
+    }
+  }
+
+  return {
+    resumen_ok:   listas.ok.join(' | ')   || '—',
+    resumen_sust: listas.sust.join(' | ') || '—',
+    resumen_ko:   listas.ko.join(' | ')   || '—',
+    total_ok:     listas.ok.length,
+    total_sust:   listas.sust.length,
+    total_ko:     listas.ko.length,
+  };
+}
+
+// ── ENVÍO A GOOGLE SHEETS ──
+document.getElementById('btnSubmit').addEventListener('click', async () => {
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Generando reporte... ⏳';
+
+  const submitTime = new Date().getTime();
+  const mttrMinutes = startTime ? Math.round((submitTime - startTime) / 60000) : 0;
+
+  // Generar los tres resúmenes ANTES de construir data
+  const resumen = generarResumenPiezas();
+
+  // Contar sustituidos (mantiene compatibilidad con campo bom_consumido)
+  const countRep = resumen.total_sust;
+
+  const data = {
+    timestamp:    new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES'),
+    equipo:       document.getElementById('equipoSelect').value,
+    tecnico:      document.getElementById('tecnico1').value,
+    observaciones:document.getElementById('observaciones').value,
+    firma:        document.getElementById('firma').value,
+    mttr_min:     mttrMinutes,
+    bom_consumido: countRep,
+    // ── RESÚMENES DE ESTADO ──────────────────────────────────
+    piezas_ok:        resumen.resumen_ok,
+    piezas_sustituidas: resumen.resumen_sust,
+    piezas_ko_alerta:  resumen.resumen_ko,
+    total_ok:         resumen.total_ok,
+    total_sustituidas: resumen.total_sust,
+    total_ko:         resumen.total_ko,
+  };
+
+  // Todos los radios individuales (columnas detalle)
+  document.querySelectorAll('input[type="radio"]:checked').forEach(r => data[r.name] = r.value);
+
+  // Diámetros
+  for (let i = 1; i <= currentRuedasCount; i++) {
+    const el = document.getElementById(`r${i}_diam`);
+    if (el) data[`r${i}_diam_mm`] = el.value;
+  }
+
+  // Mensaje de confirmación con resumen visible
+  const resumenMsg = [
+    resumen.total_ok   > 0 ? `✅ ${resumen.total_ok} piezas en óptimas condiciones`  : null,
+    resumen.total_sust > 0 ? `🔄 ${resumen.total_sust} piezas sustituidas`           : null,
+    resumen.total_ko   > 0 ? `❌ ${resumen.total_ko} piezas con alerta/KO`           : null,
+  ].filter(Boolean).join('\n');
+
+  try {
+    btn.textContent = 'Enviando a Google Sheets... 📡';
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(data)
+    });
+
+    alert(
+      `🚀 REPORTE ENVIADO A GOOGLE SHEETS\n\n` +
+      `Equipo: ${data.equipo}\n` +
+      `Técnico: ${data.tecnico}\n` +
+      `Tiempo intervención: ${mttrMinutes} min\n\n` +
+      `RESUMEN DE ESTADO:\n${resumenMsg}\n\n` +
+      (resumen.total_ko > 0
+        ? `⚠️ ALERTAS: ${resumen.resumen_ko}\n\n`
+        : '') +
+      `Los datos detallados están en Google Sheets.`
+    );
+    clearDraft();
+
+  } catch (error) {
+    alert(
+      `⚠️ Error de conexión — reporte NO enviado\n\n` +
+      `${resumenMsg}\n\n` +
+      `Revisa la URL del Apps Script y reintenta.`
+    );
+    btn.disabled = false;
+    btn.textContent = 'Confirmar e indexar en sistema';
+  }
+});
+
+// Arrancamos cargando el catálogo desde la nube.
+// loadFromLocal() se llama DENTRO de cargarEquiposDesdeNube() una vez que el select tiene opciones.
+document.addEventListener('DOMContentLoaded', cargarEquiposDesdeNube);
+</script>
+</body>
+</html>

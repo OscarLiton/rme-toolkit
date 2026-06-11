@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RME Toolkit · RMU1</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    /* ── SISTEMA DE NAVEGACIÓN DRILL-DOWN ── */
+    .dashboard-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 48px auto 0;
+      padding: 0 24px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .hub-card {
+      width: 100%; 
+      height: 140px !important;
+      padding: 16px !important;
+      cursor: pointer;
+    }
+    .hc-icon { margin-bottom: 10px !important; }
+    .hc-icon svg { width: 24px; height: 24px; }
+    .hc-title { font-size: 20px !important; }
+
+    .sub-view {
+      display: none;
+      animation: menuFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .main-view {
+      display: block;
+      animation: menuFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes menuFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sub-title-zone {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sub-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      text-transform: uppercase;
+      color: var(--text-main);
+      margin: 0;
+      line-height: 1;
+    }
+
+    .sub-desc {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-disabled);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 6px;
+    }
+
+    .btn-back-menu {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-back-menu:hover {
+      border-color: var(--amz);
+      color: var(--text-main);
+    }
+
+    /* ── ESTILOS DEL MODAL DE REPORTES ── */
+    .help-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .help-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .help-close {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .help-close:hover {
+      border-color: var(--crit);
+      color: var(--crit);
+      background: rgba(248,81,73,0.1);
+    }
+    #bugModal .input-group textarea:focus ~ label,
+    #bugModal .input-group textarea:not(:placeholder-shown) ~ label {
+      top: -8px;
+      left: 8px;
+      font-size: 10px;
+      background-color: var(--bg); 
+      padding: 0 6px;
+      color: var(--amz);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="transition" class="page-transition"></div>
+
+  <div class="portal-container">
+    <main class="portal-main" style="padding-top: 48px;">
+      
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 class="t-display" style="font-size: clamp(40px, 5vw, 64px); letter-spacing: -2px; line-height: 1;">RME TOOLKIT</h1>
+        <div class="t-micro" style="color: var(--amz); margin-top: 8px;">LOGISTICS ENGINEERING · RMU1</div>
+      </div>
+
+      <div class="dashboard-container">
+
+        <div id="view-main" class="main-view">
+          <div class="cards-grid">
+            <div class="hub-card stagger-1" style="--hc: #10b981;" onclick="openCategory('calculadoras')">
+              <div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+              <div class="t-heading hc-title">CALCULADORAS</div>
+              <div class="t-caption hc-data">CADENAS · CORREAS · ROLLOS</div>
+            </div>
+            <div class="hub-card stagger-2" style="--hc: #f97316;" onclick="openCategory('belt-welding')">
+              <div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <div class="t-heading hc-title">BELT WELDING</div>
+              <div class="t-caption hc-data">RECETAS · CHATBOT</div>
+            </div>
+            <div class="hub-card stagger-3" style="--hc: #3b82f6;" onclick="openCategory('predictivo')">
+              <div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l3-9 5 18 3-9h5"/><circle cx="12" cy="12" r="3"/></svg></div>
+              <div class="t-heading hc-title">PREDICTIVO</div>
+              <div class="t-caption hc-data">VIBRACIONES · CBM NOMENCLATURAS</div>
+            </div>
+            <div class="hub-card stagger-4" style="--hc: #8b5cf6;" onclick="openCategory('slam')">
+              <div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+              <div class="t-heading hc-title">S.L.A.M.</div>
+              <div class="t-caption hc-data">SCANNER · ETIQUETAS KO</div>
+            </div>
+            <div class="hub-card stagger-1" style="--hc: #ef4444;" onclick="openCategory('internal-repair')">
+              <div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+              <div class="t-heading hc-title">INTERNAL REPAIR</div>
+              <div class="t-caption hc-data">STX.M · OVERHAUL · CHECKLISTS</div>
+            </div>
+            <div class="hub-card stagger-2" style="--hc: #06b6d4;" onclick="openCategory('ar')">
+              <div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l3-9 5 18 3-9h5"/></svg></div>
+              <div class="t-heading hc-title">AR</div>
+              <div class="t-caption hc-data">VISOR AR · OVERLAYS</div>
+            </div>
+            <div class="hub-card stagger-3" style="--hc: #9ca3af;" onclick="openCategory('links')">
+              <div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>
+              <div class="t-heading hc-title">LINKS & EAM</div>
+              <div class="t-caption hc-data">REPORTES · EXTERNO</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-calculadoras" class="sub-view">
+          <div class="sub-header">
+            <div class="sub-title-zone"><h2 class="sub-title" style="color: #10b981;">Calculadoras</h2><span class="sub-desc">Dimensionado Mecánico y Geometría</span></div>
+            <button class="btn-back-menu" onclick="closeCategory()">← Volver</button>
+          </div>
+          <div class="cards-grid">
+            <a href="cadenas.html" class="hub-card" style="--hc: var(--accent-cadenas);"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><div class="t-heading hc-title">CALCULADORA CADENAS</div><div class="t-caption hc-data">CLASE 0 · TOLERANCIAS</div></a>
+            <a href="correas.html" class="hub-card" style="--hc: var(--accent-correas);"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div class="t-heading hc-title">TENSIÓN CORREAS HZ</div><div class="t-caption hc-data">FRECUENCIAS · PAR MOTOR</div></a>
+            <a href="rollos.html" class="hub-card" style="--hc: var(--accent-rollos);"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg></div><div class="t-heading hc-title">LONGITUD ROLLOS</div><div class="t-caption hc-data">CÁLCULO BANDA RESTANTE</div></a>
+          </div>
+        </div>
+
+        <div id="view-belt-welding" class="sub-view">
+          <div class="sub-header">
+            <div class="sub-title-zone"><h2 class="sub-title" style="color: #f97316;">Belt Welding</h2><span class="sub-desc">Empalmes vulcanizados y manuales de banda</span></div>
+            <button class="btn-back-menu" onclick="closeCategory()">← Volver</button>
+          </div>
+          <div class="cards-grid">
+            <a href="recetas.html" class="hub-card" style="--hc: var(--accent-recetas);"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="t-heading hc-title">RECETAS SOLDADURA</div><div class="t-caption hc-data">PARÁMETROS SHEETS</div></a>
+            <a href="soldadura-bot.html" class="hub-card" style="--hc: #8b5cf6;"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div><div class="t-heading hc-title">CHATBOT SOLDADURA</div><div class="t-caption hc-data">GUÍA INTERACTIVA · PASO A PASO</div></a>
+          </div>
+        </div>
+
+        <div id="view-predictivo" class="sub-view">
+          <div class="sub-header">
+            <div class="sub-title-zone"><h2 class="sub-title" style="color: #3b82f6;">Predictivo</h2><span class="sub-desc">Condition Based Monitoring (CBM)</span></div>
+            <button class="btn-back-menu" onclick="closeCategory()">← Volver</button>
+          </div>
+          <div class="cards-grid">
+            <a href="cbm.html" class="hub-card" style="--hc: #3b82f6;"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l3-9 5 18 3-9h5"/><circle cx="12" cy="12" r="3"/></svg></div><div class="t-heading hc-title">DICCIONARIO CBM</div><div class="t-caption hc-data">BUSCADOR DE NOMENCLATURAS</div></a>
+          </div>
+        </div>
+
+        <div id="view-slam" class="sub-view">
+          <div class="sub-header">
+            <div class="sub-title-zone"><h2 class="sub-title" style="color: #8b5cf6;">S.L.A.M.</h2><span class="sub-desc">Mantenimiento de Scanners y Etiquetadoras</span></div>
+            <button class="btn-back-menu" onclick="closeCategory()">← Volver</button>
+          </div>
+          <div class="cards-grid">
+            <a href="slam.html" class="hub-card" style="--hc: #8b5cf6;"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div class="t-heading hc-title">ETIQUETAS KO</div><div class="t-caption hc-data">ANÁLISIS DE RECHAZOS Y CÓDIGOS</div></a>
+          </div>
+        </div>
+
+        <div id="view-internal-repair" class="sub-view">
+          <div class="sub-header">
+            <div class="sub-title-zone"><h2 class="sub-title" style="color: #ef4444;">Internal Repair</h2><span class="sub-desc">Registros de Mantenimiento Correctivo y Overhaul</span></div>
+            <button class="btn-back-menu" onclick="closeCategory()">← Volver</button>
+          </div>
+          <div class="cards-grid">
+            <a href="stx-reparacion.html" class="hub-card" style="--hc: #ef4444;">
+              <div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+              <div class="t-heading hc-title">DIVERTS STX.M</div>
+              <div class="t-caption hc-data">CHECKLIST DE REPARACIÓN Y BANCO</div>
+            </a>
+          </div>
+        </div>
+
+        <div id="view-ar" class="sub-view">
+          <div class="sub-header">
+            <div class="sub-title-zone"><h2 class="sub-title" style="color: #06b6d4;">AR</h2><span class="sub-desc">Soporte visual mediante overlays en planta</span></div>
+            <button class="btn-back-menu" onclick="closeCategory()">← Volver</button>
+          </div>
+          <div class="cards-grid">
+            <div class="hub-card" style="--hc: #6b7280; opacity: 0.5; cursor: default;"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l3-9 5 18 3-9h5"/></svg></div><div class="t-heading hc-title">VISOR AR WELDING</div><div class="t-caption hc-data">EN DESARROLLO BETA</div></div>
+          </div>
+        </div>
+
+        <div id="view-links" class="sub-view">
+          <div class="sub-header">
+            <div class="sub-title-zone"><h2 class="sub-title" style="color: #9ca3af;">Links & Sistemas</h2><span class="sub-desc">Accesos rápidos a plataformas corporativas</span></div>
+            <button class="btn-back-menu" onclick="closeCategory()">← Volver</button>
+          </div>
+          <div class="cards-grid">
+            <a href="#" class="hub-card" style="--hc: #9ca3af;"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div><div class="t-heading hc-title">PORTAL INFOR EAM</div><div class="t-caption hc-data">ÓRDENES DE TRABAJO</div></a>
+            <a href="#" class="hub-card" style="--hc: #eab308;"><div class="hc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div><div class="t-heading hc-title">TROUBLE TICKETS</div><div class="t-caption hc-data">REPORTE INCIDENCIAS</div></a>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <footer class="portal-footer" style="margin-top: 64px; display: flex; flex-direction: column; align-items: center; gap: 12px; padding-bottom: 32px;">
+      <div class="t-micro">Amazon RME · RMU1 · © 2026 Óscar Litón Nevado. Todos los derechos reservados.</div>
+      <button onclick="abrirReporteFallo()" class="btn-back-menu" style="font-size: 10px; padding: 6px 12px; border-color: var(--crit); color: var(--crit); background: rgba(248,81,73,0.05); margin-top: 8px;">⚠️ REPORTAR FALLO EN LA PÁGINA</button>
+    </footer>
+  </div>
+
+  <div class="help-overlay" id="bugOverlay" onclick="cerrarReporteFallo()"></div>
+
+  <div class="result-block state-empty" id="bugModal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); z-index: 500; background: var(--bg-panel); width: 90%; max-width: 500px; padding: 24px; display: none; opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px;">
+      <div>
+        <h2 class="t-display" style="font-size: 24px; color: var(--crit); line-height: 1;">REPORTAR FALLO</h2>
+        <div class="t-caption" style="font-size: 11px; color: var(--text-disabled); margin-top: 4px;">Sistema de Ticketing Interno RME Toolkit</div>
+      </div>
+      <button class="help-close" onclick="cerrarReporteFallo()">✕</button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div class="input-group">
+        <select id="bug-modulo" required style="width: 100%; background-color: var(--card2); border: 1px solid var(--border-field); border-radius: 6px; padding: 18px 12px 8px 12px; color: var(--text-main); font-family: var(--font-mono); font-size: 14px; outline: none;">
+          <option value="" disabled selected hidden></option>
+          <option value="Calculadora de Cadenas">Cadenas</option>
+          <option value="Tensión de Correas">Correas</option>
+          <option value="Calculadora de Rollos">Rollos</option>
+          <option value="Recetas de Soldadura">Recetas Belt Welding</option>
+          <option value="Predictivo CBM">Predictivo CBM</option>
+          <option value="SLAM Etiquetas">SLAM</option>
+          <option value="Internal Repair">Internal Repair</option>
+          <option value="Otro / General">Otro / General</option>
+        </select>
+        <label class="t-caption">Módulo donde ocurre el fallo</label>
+      </div>
+
+      <div class="input-group">
+        <select id="bug-urgencia" required style="width: 100%; background-color: var(--card2); border: 1px solid var(--border-field); border-radius: 6px; padding: 18px 12px 8px 12px; color: var(--text-main); font-family: var(--font-mono); font-size: 14px; outline: none;">
+          <option value="Baja" selected>Baja - Mejora o fallo estético</option>
+          <option value="Media">Media - Un cálculo falla pero hay alternativa</option>
+          <option value="Alta">Alta - Bloquea el trabajo o rompe la página</option>
+        </select>
+        <label class="t-caption">Nivel de impacto</label>
+      </div>
+
+      <div class="input-group" style="margin-bottom: 8px;">
+        <textarea id="bug-desc" placeholder=" " required rows="4" style="width: 100%; background-color: var(--card2); border: 1px solid var(--border-field); border-radius: 6px; padding: 18px 12px 8px 12px; color: var(--text-main); font-family: var(--font-mono); font-size: 13px; outline: none; resize: none; transition: border-color 0.2s;"></textarea>
+        <label class="t-caption">Describe qué hacías y qué falló...</label>
+      </div>
+    </div>
+
+    <button class="btn-action t-heading" style="background: rgba(248,81,73,0.1); border-color: var(--crit); color: var(--crit); margin-top: 16px; width: 100%; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: 700;" onclick="enviarReporteOutlook()">
+      GENERAR REPORTE EN OUTLOOK
+    </button>
+  </div>
+
+  <script>
+    function openCategory(catId) {
+      document.getElementById('view-main').style.display = 'none';
+      document.querySelectorAll('.sub-view').forEach(function(el) { el.style.display = 'none'; });
+      const targetView = document.getElementById('view-' + catId);
+      if (targetView) targetView.style.display = 'block';
+    }
+
+    function closeCategory() {
+      document.querySelectorAll('.sub-view').forEach(function(el) { el.style.display = 'none'; });
+      document.getElementById('view-main').style.display = 'block';
+    }
+
+    /* ── LÓGICA DEL MODAL INTEGRADA ── */
+    function abrirReporteFallo() {
+        const modal = document.getElementById('bugModal');
+        const overlay = document.getElementById('bugOverlay');
+        if(modal && overlay) {
+            modal.style.display = 'block';
+            overlay.classList.add('open');
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 10);
+        }
+    }
+
+    function cerrarReporteFallo() {
+        const modal = document.getElementById('bugModal');
+        const overlay = document.getElementById('bugOverlay');
+        if(modal && overlay) {
+            modal.style.opacity = '0';
+            modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+            overlay.classList.remove('open');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
+        }
+    }
+
+    function enviarReporteOutlook() {
+        const modulo = document.getElementById('bug-modulo').value || 'No especificado';
+        const urgencia = document.getElementById('bug-urgencia').value;
+        const desc = document.getElementById('bug-desc').value;
+
+        if (!desc.trim()) {
+            alert("Por favor, escribe una breve descripción del fallo.");
+            return;
+        }
+
+        const correoDestino = "oslitonn@amazon.es"; 
+        const asunto = `[RME Toolkit Bug] Fallo en ${modulo} - Prioridad ${urgencia}`;
+        const cuerpo = `Hola Óscar,\n\nHe detectado el siguiente fallo usando el RME Toolkit:\n\n📍 MÓDULO AFECTADO: ${modulo}\n🔴 URGENCIA: ${urgencia}\n\n📝 DESCRIPCIÓN DEL PROBLEMA:\n${desc}\n\n-----------------------------------------\nReporte generado automáticamente desde la página principal de RMU1 Toolkit.`;
+
+        const mailtoUrl = `mailto:${correoDestino}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+        window.location.href = mailtoUrl;
+
+        document.getElementById('bug-desc').value = '';
+        cerrarReporteFallo();
+    }
+  </script>
+
+  <script src="main.js"></script>
+</body>
+</html>
